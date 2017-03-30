@@ -1,0 +1,99 @@
+      <section id="contact">
+        <form method="post">
+          <fieldset name="contattaci">
+            <legend>Registro Visitatori</legend>
+            <label>
+              Nick:
+              <input type="text" name="nickname" autocomplete="on"
+              required pattern="[a-z]{1}[a-z_]{2,19}"
+              title="A nickname is composed by lowercase letters and '_'; 3 to 20 chars are allowed."
+              placeholder="your_nickname">
+            </label>
+            <label>
+              Email:
+              <input type="email" name="email" autocomplete="on" placeholder="email@domain.com">
+            </label>
+            <label>
+              Messaggio:
+              <textarea name="messaggio" placeholder="scrivi qui il tuo messaggio (max 300 caratteri)" maxlength="300" required></textarea>
+            </label>
+          </fieldset>
+          <input type="reset"  value="Reset">
+          <input type="submit" value="Invia">
+        </form>
+      </section>
+
+
+$(document).ready(function() {
+  $("#a0").load("vetrina.php", function() {
+    $(".tabella_prodotti").click(function() {
+      swapPage("dettaglio", "dettaglio.php", null);
+    })
+  });
+  current_page = "vetrina";
+});
+
+
+/*table tr:last-child td:first-child {
+    border-bottom-left-radius: 20px;
+}
+
+table tr:last-child td:last-child {
+    border-bottom-right-radius: 20px;
+}
+
+table tr:first-child td:first-child {
+    border-top-left-radius: 20px;
+}
+
+table tr:first-child td:last-child {
+    border-top-right-radius: 20px;
+}*/
+
+
+<div id="a2" class="articolo">
+  <header>
+    <h2>Ultimo Prodotto</h2>
+  </header>
+  <p>Questo è l'ultimo prodotto inserito a catalogo:<br></p>
+  <div class="vetrina">
+    <?php
+      $db = mysqli_connect("localhost", "root", "", "progetto");
+      if(!$db) {
+        echo "connection failed: ".mysqli_connect_error();
+      } else {
+        $result = $db->query("SELECT * FROM Prodotti
+                              ORDER BY reg_date DESC
+                              LIMIT 1;");
+        if ($result) {
+          if ($result->num_rows > 0) {
+            while($row = $result->fetch_assoc()) { ?>
+              <table class="tabella_prodotti">
+                <?php if($row["img"] != null) { ?>
+                  <tr><td class="prdt_img_row"><img class="prdt_img" alt="immagine del prodotto" src="<?php echo $row["img"]; ?>"></td></tr>
+                <?php } ?>
+                <tr><td><?php echo $row["nome"]; ?></td></tr>
+                <tr><td><?php echo $row["costo"]. " €"; ?></td></tr>
+                <tr><td><?php echo $row["quantita"];
+                          if ($row["quantita"] == 1) {
+                            echo " pezzo disponibile";
+                          } else {
+                            echo " pezzi disponibili";
+                          }?></td></tr>
+                <tr>
+                  <td><button type="button">Acquista</button><button type="button">Informazioni</button></td>
+                </tr>
+              </table>
+            <?php
+            }
+          } else {
+          echo "0 results";
+          }
+        } else {
+          echo " Errore nella Query SQL";
+        }
+        $db->close();
+      }
+    ?>
+  </div>
+</div>

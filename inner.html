@@ -1,0 +1,26 @@
+<div id="spinner"></div>
+
+<section id="ricerca">
+    <label>Cerca tra i prodotti:
+        <input id="search_field" placeholder="Parola Chiave"></input>
+    </label>
+    <button id="send_button" onclick="search()">Cerca</button>
+</section>
+
+<aside id="carrello_aside">
+    <section id="carrello_aside_title">
+        <h3>Carrello</h3>
+    </section>
+    <section id="carrello_aside_inner">
+        <table id="carrello_aside_table" class="carrello_table carrello_table_aside">
+            <tr>
+                <th>Prodotti</br>nel carrello</th>
+            </tr>
+            <tr>
+                <td>Nessun Prodotto</td>
+            </tr>
+        </table>
+        <button class="svuota svuota2" onclick="emptyCart()">Svuota Carrello</button>
+        <button class="svuota svuota2" onclick="apriCarrello()">Apri Carrello</button>
+    </section>
+</aside>

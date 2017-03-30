@@ -1,0 +1,366 @@
+h1 {
+    background-color: #ecd8c6;
+    font-family: Monsieur La Doulaise;
+    font-size: 7vh;
+    font-style: normal;
+    font-variant: normal;
+    font-weight: 500;
+}
+
+h1, h2 {
+    padding-top: 1%;
+    padding-bottom: 1%;
+}
+
+h1, h2, h3 {
+    text-align: center;
+    margin-top: 0;
+}
+
+body {
+    display: inline;
+    margin: auto;
+    overflow: auto;
+    background-color: #DDDDDD;
+    font-family: "Verdana";
+    font-size: 85%;
+}
+
+main {
+    overflow: visible;
+    float:left;
+    width: 75vw;
+}
+
+table, th, td {
+    border: 1px solid #BBB;
+}
+
+table {
+    width: auto;
+    height: auto;
+}
+
+input, textarea {
+    width: 7vw;
+}
+
+.menu_item {
+    float: left;
+    display: inline-block;
+    color: black;
+    text-align: center;
+    padding: 14px 16px;
+    text-decoration: none;
+}
+
+.tabella_prodotti {
+    margin-left: 1vw;
+    margin-bottom: 1vw;
+    table-layout: fixed;
+    display: inline-block;
+    border-style: hidden;
+    border-spacing: 0;
+}
+
+.tabella_prodotti td {
+    border-bottom-style: hidden;
+}
+
+.tabella_prodotti tr:last-child td{
+    border-bottom-style: solid;
+    border-bottom-left-radius: 1vw;
+    border-bottom-right-radius: 1vw;
+}
+
+.tabella_prodotti tr:first-child td {
+    border-top-left-radius: 1vw;
+    border-top-right-radius: 1vw;
+}
+
+.prdt_img_row {
+    width: 15vw;
+    height: 15vw;
+    max-width: 15vw;
+    max-height: 15vw;
+    text-align: center;
+    overflow: hidden;
+}
+
+.prdt_img {
+    display: block;
+    max-width: inherit;
+    max-height: inherit;
+    margin: auto;
+}
+
+.last_prdt_img {
+    float: left;
+    max-width: 18vw;
+    max-height: 18vw;
+    margin-left: 1vw;
+    margin-right: 1vw;
+    margin-top: 0;
+    margin-bottom: 1vw;
+}
+
+.main2 {
+    text-align: center;
+    margin-left: 13vw;
+}
+
+.articolo {
+    text-align: center;
+    overflow: auto;
+    margin-bottom: 2%;
+    border-radius: 5px;
+    border: 2px solid;
+    border-color: #777777;
+    background-color: white;
+}
+
+.articolo .articolo {
+    border-left: 0;
+    border-right: 0;
+    border-radius: 0;
+}
+
+.articolo .articolo:first-child {
+    border-top: 0;
+}
+
+.articolo .articolo:last-child {
+    margin-bottom: 0;
+    border-bottom: 0;
+}
+
+.commento {
+    display: none;
+    margin: 1% 1% 1% 1%;
+    border-radius: 5px;
+    border: 2px solid;
+    border-color: #777777;
+    background-color: #EEEEEE;
+}
+
+.comment_button {
+    margin: 1% 0% 1% 0%;
+}
+
+.vetrina {
+    text-align: center;
+}
+
+.dettagli_descrizione {
+    margin-left: 1vw;
+    margin-right: 1vw;
+}
+
+.dettagli_bottom {
+    margin: auto;
+    display: inline-block;
+    margin-bottom: 3vh;
+}
+
+.descrizione {
+    text-align: justify;
+}
+
+.result_pages_text {
+    display: inline;
+}
+
+.svuota {
+    display: block;
+    margin: auto;
+    text-align: center;
+}
+
+.svuota2 {
+    width: 10vw;
+    max-width: 10vw;
+    margin-top: 1vh;
+}
+
+.carrello_table {
+    margin: auto;
+    text-align: center;
+    border-collapse: collapse;
+    background-color: #f9f2ec;
+}
+
+.carrello_table_aside {
+    width: 10vw;
+    max-width: 10vw;
+}
+
+.carrello_table_page {
+    width: 30vw;
+    max-width: 30vw;
+}
+
+.dati_carrello label {
+    display: flex;
+    justify-content: space-between;
+    margin: auto;
+    margin-left: 0;
+}
+
+.dati_carrello label input {
+    margin-left: 1vw;
+}
+
+.dati_carrello .avanti {
+    margin-top: 2vh;
+}
+
+.disp_inner p {
+    display: inline;
+}
+
+.disp_inner {
+    margin-bottom: 1vh;
+}
+
+.secret_element {
+    margin-bottom: 3vh;
+}
+
+.products_row {
+    display: inline;
+    width: inherit;
+}
+
+.products_row p {
+    display: inline;
+}
+
+#secret_buttons {
+    margin-top: 2vh;
+    margin-bottom: 2vh;
+}
+
+#titolo {
+    padding-top: 1.2%;
+    padding-bottom: 1%;
+}
+
+#a0 {
+    box-shadow: 10px 10px 5px #888888;
+}
+
+#ordinaPerContainer {
+    text-align: left;
+    margin: 1vw;
+}
+
+#ordinaPer0, #ordinaPer1 {
+    display: inline;
+}
+
+#spinner {
+    position: fixed;
+    top: 3vh;
+    left: 3vw;
+    border-radius: 10px;
+    background-color:#d9b08c;
+}
+
+#ricerca {
+    display: none;
+    position: fixed;
+    top: 3vh;
+    right: 3vw;
+    padding: 1vw;
+    border-radius: 10px;
+    background-color:#d9b08c;
+}
+
+#carrello_aside {
+    margin-left: 3.2vw;
+    margin-right: 4vw;
+    float: left;
+    width: 10vw;
+    max-width: 10vw;
+    padding-left: 1.5vw;
+    padding-right: 1.5vw;
+    padding-bottom: 2vh;
+    padding-top: 2vh;
+    border-radius: 10px;
+    border: 1px solid;
+    border-color: black;
+    background-color: #ecd8c6;
+    box-shadow: 10px 10px 5px #888888;
+}
+
+#carrello_aside_title {
+    margin: auto;
+    text-align: center;
+}
+
+#carrello_page_inner {
+    text-align: center;
+    display: inline-block;
+}
+
+#menu {
+    margin-left: 1vw;
+    margin-right: 1vw;
+    margin-bottom: 4vh;
+    margin-top: 1vh;
+}
+
+#menu_list {
+    list-style-type: none;
+    padding: 0;
+    overflow: hidden;
+    border-radius: 5px;
+    border: 1px solid;
+    background-color: #ecd8c6;
+    box-shadow: 10px 10px 5px #888888;
+}
+
+#textarea_messaggio {
+    width: 20vw;
+    height: 10vh;
+}
+
+#upload_fieldset {
+    width: 50vw;
+    text-align: center;
+    border: none;
+    margin-top: 1vh;
+}
+
+#upload_fieldset1 {
+    text-align: center;
+    display: inline-block;
+    border: none;
+    margin-top: 1vh;
+    margin-bottom: 1vh;
+}
+
+#upload_fieldset input {
+    width: 30vw;
+}
+
+#upload_fieldset textarea {
+    width: 30vw;
+    height: 20vh;
+}
+
+#upload_fieldset #submit_button {
+    margin-top: 5vh;
+}
+
+#upload_fieldset #data_inserted_button {
+    margin-top: 2vh;
+}
+
+#upload_fieldset label {
+    display: flex;
+    justify-content: space-between;
+    margin: auto;
+    text-align: center;
+    border: none;
+}
