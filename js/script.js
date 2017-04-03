@@ -6,7 +6,7 @@ $(document).ready(function() {
         var bbq = $.deparam.fragment();
         swapPage(bbq["url"], eval(bbq["params"]));
     });
-    if ($.deparam.fragment()['url'] === undefined) {
+    if ($.deparam.fragment()['url'] === undefined && window.location.pathname.match("pagina")) {
         $.bbq.pushState({"url":"vetrina.php", "params":null});
     }
     $(window).trigger( 'hashchange' );
