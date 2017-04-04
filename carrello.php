@@ -74,133 +74,140 @@ function is_session_started()
                     <?php
                     if (isset($_SESSION['prod']) && count($_SESSION['prod']) >= 1) { ?>
                         <form method="post">
-                            <input class="svuota svuota2" type="submit" name="svuota" value="Svuota Carrello"></input>
+                            <input class="svuota svuota2" type="submit" name="svuota" value="Svuota Carrello">
                         </form>
                         <form action='carrello.php?step=1' method="post">
-                            <input class="svuota svuota2" type="submit" value="Avanti"></input>
+                            <input class="svuota svuota2" type="submit" value="Avanti">
                         </form>
                     <?php } else { ?>
-                        <p class="svuota svuota2">Carrello vuoto</p>
+                        <h3 class="svuota svuota2">Carrello vuoto</h3>
                     <?php } ?>
                 </section>
-            <?php } else if (isset($_GET['step']) && $_GET['step'] == 1) { ?>
-                <section id="carrello_page_inner">
-                    <h4>Inserisci i tuoi dati personali<h4>
-                            <form action='carrello.php?step=2' method="post">
-                                <fieldset class="dati_carrello">
-                                    <label>Nome:
-                                        <input id="carrello_nome" type="text" name="nome" placeholder="Nome" required></input>
-                                    </label>
-                                    <label>Cognome:
-                                        <input id="carrello_cognome" type="text" name="cognome" placeholder="Cognome" required></input>
-                                    </label>
-                                    <label>Città:
-                                        <input id="carrello_citta" type="text" name="citta" placeholder="Città" required></input>
-                                    </label>
-                                    <label>Indirizzo:
-                                        <input id="carrello_indirizzo" type="text" name="indirizzo" placeholder="Indirizzo" required></input>
-                                    </label>
-                                    <label>Telefono:
-                                        <input id="carrello_telefono" type="number" name="telefono" placeholder="Telefono" required></input>
-                                    </label>
-                                    <label>E-Mail:
-                                        <input id="carrello_email" type="email" name="email" placeholder="E-Mail" required></input>
-                                    </label>
-                                    <input class="svuota svuota2 avanti" type="submit" value="Avanti">
-                                </fieldset>
-                            </form>
-                </section>
-            <?php } else if (isset($_GET['step']) && $_GET['step'] == 2) {
-                $_SESSION['dati'] = array();
-                $_SESSION['dati'] = $_POST; ?>
-                <h4>Riepilogo</h4>
-                <h5>Prodotti nel Carrello</h5>
-                <table id="carrello_page_table" class="carrello_table carrello_table_page">
-                </table>
-                <h5>Dati Inseriti</h5>
-                <p>Nome: <?php echo $_POST['nome'] ?></p>
-                <p>Cognome: <?php echo $_POST['cognome'] ?></p>
-                <p>Città: <?php echo $_POST['citta'] ?></p>
-                <p>Indirizzo: <?php echo $_POST['indirizzo'] ?></p>
-                <p>Telefono: <?php echo $_POST['telefono'] ?></p>
-                <p>E-Mail: <?php echo $_POST['email'] ?></p>
-                <form action='carrello.php?step=3' method="post">
-                    <input class="svuota svuota2 avanti" type="submit" value="Avanti">
-                </form>
-            <?php } else if (isset($_GET['step']) && $_GET['step'] == 3) {
+            <?php } else {
                 if (!is_session_started()) {
-                    echo("<p>Sessione scaduta.</p>");
-                } else { ?>
-                    <section id="carrello_page_inner">
-                        <h4>Inserisci i dati della tua carta di credito<h4>
-                                <form action='carrello.php?step=4' method="post">
+                    echo("<h3>Sessione scaduta.</h3>");
+                } else  if (!isset($_GET['step'])) {
+                    echo("<p>Errore nell'interpretazione del passo corrente</p>");
+                }else {
+                    switch ($_GET['step']) {
+                        case 1: ?>
+                            <section id="carrello_page_inner">
+                                <h4>Inserisci i tuoi dati personali</h4>
+                                <form action='carrello.php?step=2' method="post">
                                     <fieldset class="dati_carrello">
-                                        <label>Codice carta di credito:
-                                            <input id="carrello_numero_carta" name="codice" placeholder="Numero Carta"></input>
+                                        <label>Nome:
+                                            <input id="carrello_nome" type="text" name="nome" placeholder="Nome" required>
                                         </label>
-                                        <label>Data di scadenza (MM-AA):
-                                            <input id="carrello_scadenza_carta" name="scadenza"></input>
+                                        <label>Cognome:
+                                            <input id="carrello_cognome" type="text" name="cognome" placeholder="Cognome" required>
                                         </label>
-                                        <label>Codice di sicurezza a 3 cifre:
-                                            <input id="carrello_codice_sicurezza" placeholder="Codice di Sicurezza" name="codiceSicurezza"></input>
+                                        <label>Città:
+                                            <input id="carrello_citta" type="text" name="citta" placeholder="Città" required>
+                                        </label>
+                                        <label>Indirizzo:
+                                            <input id="carrello_indirizzo" type="text" name="indirizzo" placeholder="Indirizzo" required>
+                                        </label>
+                                        <label>Telefono:
+                                            <input id="carrello_telefono" type="number" name="telefono" placeholder="Telefono" required>
+                                        </label>
+                                        <label>E-Mail:
+                                            <input id="carrello_email" type="email" name="email" placeholder="E-Mail" required>
                                         </label>
                                         <input class="svuota svuota2 avanti" type="submit" value="Avanti">
                                     </fieldset>
                                 </form>
-                    </section>
-                <?php } ?>
-            <?php } else if (isset($_GET['step']) && $_GET['step'] == 4) {
-                if (!is_session_started()) {
-                    echo("<p>Sessione scaduta.</p>");
-                } else {
-                    $db = mysqli_connect("localhost", "writer", "", "progetto");
-                    if (!$db) {
-                        echo "connection failed: " . mysqli_connect_error();
-                    } else {
-                        $ok = true;
-                        $prods = $_SESSION['prod'];
-                        $result1 = $db->query("REPLACE INTO Cliente
-                                          VALUES ('" . $_SESSION['dati']['nome'] . "','" . $_SESSION['dati']['cognome'] . "','" . $_SESSION['dati']['citta'] . "','" . $_SESSION['dati']['indirizzo'] . "','"
-                                        . $_SESSION['dati']['telefono'] . "','" . $_SESSION['dati']['email'] . "','" . $_POST['codice'] . "','" . $_POST['scadenza'] . "','" . $_POST['codiceSicurezza'] . "');");
+                            </section>
+                            <?php break;
+                        case 2:
+                            $_SESSION['dati'] = array();
+                            $_SESSION['dati'] = $_POST; ?>
+                            <h4>Riepilogo</h4>
+                            <h5>Prodotti nel Carrello</h5>
+                            <table id="carrello_page_table" class="carrello_table carrello_table_page">
+                            </table>
+                            <h5>Dati Inseriti</h5>
+                            <p>Nome: <?php echo $_POST['nome'] ?></p>
+                            <p>Cognome: <?php echo $_POST['cognome'] ?></p>
+                            <p>Città: <?php echo $_POST['citta'] ?></p>
+                            <p>Indirizzo: <?php echo $_POST['indirizzo'] ?></p>
+                            <p>Telefono: <?php echo $_POST['telefono'] ?></p>
+                            <p>E-Mail: <?php echo $_POST['email'] ?></p>
+                            <form action='carrello.php?step=3' method="post">
+                                <input class="svuota svuota2 avanti" type="submit" value="Avanti">
+                            </form>
+                            <?php break;
+                        case 3: ?>
+                            <section id="carrello_page_inner">
+                                <h4>Inserisci i dati della tua carta di credito</h4>
+                                <form action='carrello.php?step=4' method="post">
+                                    <fieldset class="dati_carrello">
+                                        <label>Codice carta di credito:
+                                            <input id="carrello_numero_carta" name="codice" placeholder="Numero Carta">
+                                        </label>
+                                        <label>Data di scadenza (MM-AA):
+                                            <input id="carrello_scadenza_carta" name="scadenza">
+                                        </label>
+                                        <label>Codice di sicurezza a 3 cifre:
+                                            <input id="carrello_codice_sicurezza" placeholder="Codice di Sicurezza" name="codiceSicurezza">
+                                        </label>
+                                        <input class="svuota svuota2 avanti" type="submit" value="Avanti">
+                                    </fieldset>
+                                </form>
+                            </section>
+                            <?php break;
+                        case 4:
+                            $db = mysqli_connect("localhost", "writer", "", "progetto");
+                            if (!$db) {
+                                echo "connection failed: " . mysqli_connect_error();
+                            } else {
+                                $ok = true;
+                                $prods = $_SESSION['prod'];
+                                $result1 = $db->query("REPLACE INTO Cliente
+                                              VALUES ('" . $_SESSION['dati']['nome'] . "','" . $_SESSION['dati']['cognome'] . "','" . $_SESSION['dati']['citta'] . "','" . $_SESSION['dati']['indirizzo'] . "','"
+                                    . $_SESSION['dati']['telefono'] . "','" . $_SESSION['dati']['email'] . "','" . $_POST['codice'] . "','" . $_POST['scadenza'] . "','" . $_POST['codiceSicurezza'] . "');");
 
-                        if ($result1) {
-                            for ($i = 0; $i < sizeof($prods); $i++) {
-                                $quantita = $prods[$i]['quantita'];
-                                $id = $prods[$i]['id'];
-                                $result = $db->query("INSERT INTO Acquisto(email, prodotto, quantita) VALUES ('" . $_SESSION['dati']['email'] . "','" . $id . "','" . $quantita . "');");
-                                if ($result) {
-                                    $result2 = $db->query("UPDATE Vendite SET venduti = venduti + $quantita, disponibile = disponibile - $quantita WHERE id_prodotto = $id");
-                                    if (!$result2) {
-                                        echo " Errore nella Query SQL: ";
-                                        printf("Errormessage: %s\n", $db->error);
-                                        $ok = false;
-                                        break;
+                                if ($result1) {
+                                    for ($i = 0; $i < sizeof($prods); $i++) {
+                                        $quantita = $prods[$i]['quantita'];
+                                        $id = $prods[$i]['id'];
+                                        $result = $db->query("INSERT INTO Acquisto(email, prodotto, quantita) VALUES ('" . $_SESSION['dati']['email'] . "','" . $id . "','" . $quantita . "');");
+                                        if ($result) {
+                                            $result2 = $db->query("UPDATE Vendite SET venduti = venduti + $quantita, disponibile = disponibile - $quantita WHERE id_prodotto = $id");
+                                            if (!$result2) {
+                                                echo " Errore nella Query SQL: ";
+                                                printf("Errormessage: %s\n", $db->error);
+                                                $ok = false;
+                                                break;
+                                            }
+                                        } else {
+                                            echo " Errore nella Query SQL: ";
+                                            printf("Errormessage: %s\n", $db->error);
+                                            $ok = false;
+                                            break;
+                                        }
                                     }
                                 } else {
-                                    echo " Errore nella Query SQL: ";
-                                    printf("Errormessage: %s\n", $db->error);
                                     $ok = false;
-                                    break;
                                 }
+                                if ($ok) {
+                                    session_unset();
+                                    session_destroy();
+                                    if (isset($_COOKIE['ordini'])) {
+                                        unset($_COOKIE['ordini']);
+                                        setcookie('ordini', null, -1, '/');
+                                    }
+                                    echo "<p>Ordine eseguito correttamente!</p>";
+                                } else {
+                                    echo $db->error;
+                                }
+                                $db->close();
                             }
-                        } else {
-                            $ok = false;
-                        }
-                        if ($ok) {
-                            session_unset();
-                            session_destroy();
-                            if (isset($_COOKIE['ordini'])) {
-                                unset($_COOKIE['ordini']);
-                                setcookie('ordini', null, -1, '/');
-                            }
-                            echo "<p>Ordine eseguito correttamente!</p>";
-                        } else {
-                            echo $db->error;
-                        }
-                        $db->close();
+                            break;
+                        default:
+                            echo("<p>Errore nell'interpretazione del passo corrente</p>");
                     }
                 }
-            }?>
+            } ?>
         </section>
     </section>
 </main>
