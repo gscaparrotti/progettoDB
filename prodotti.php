@@ -5,9 +5,8 @@
   <div id="ordinaPerContainer">
     <label id="ordinaPer0">Ordina per:
       <select id="ordinaPer1">
-        <option onclick="reorderList()" value="nome">Nome</option>
-        <option onclick="reorderList()" value="costo">Prezzo</option>
-        <option onclick="reorderList()" value="reg_date">Data di Inserimento</option>
+        <option onclick="reorderList()" value="Nome">Nome</option>
+        <option onclick="reorderList()" value="Costo">Prezzo di Listino</option>
       </select>
     </label>
   </div>

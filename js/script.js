@@ -132,12 +132,12 @@ function highlightPage() {
     });
 }
 
-function addToCart(id, nome) {
+function addToCart(id, nome, sconto, cond) {
     var ordini = Cookies.getJSON("ordini");
     var ok = false;
     if (ordini === undefined) {
-        if (document.getElementById("pezzi_disponibili").innerHTML > 0) {
-            ordini = [{"id" : id, "nome" : nome, "quantita" : 1}];
+        if (document.getElementById("pezzi_disponibili".concat(cond).concat(sconto)).innerHTML > 0) {
+            ordini = [{"id" : id, "nome" : nome, "cond" : cond, "sconto" : sconto, "quantita" : 1}];
             ok = true;
         } else {
             alert("Disponibilità terminata");
@@ -146,8 +146,8 @@ function addToCart(id, nome) {
         var i = 0;
         var added = false;
         for (i=0; i<ordini.length; i++) {
-            if(ordini[i]["id"] === id) {
-                if (ordini[i]["quantita"] < document.getElementById("pezzi_disponibili").innerHTML) {
+            if(ordini[i]["id"] === id && ordini[i]["cond"] === cond) {
+                if (ordini[i]["quantita"] < document.getElementById("pezzi_disponibili".concat(cond).concat(sconto)).innerHTML) {
                     ordini[i]["quantita"] += 1;
                     ok = true;
                 } else {
@@ -158,8 +158,8 @@ function addToCart(id, nome) {
             }
         }
         if(!added) {
-            if (document.getElementById("pezzi_disponibili").innerHTML > 0) {
-                ordini.push({"id" : id, "nome" : nome, "quantita" : 1});
+            if (document.getElementById("pezzi_disponibili".concat(cond).concat(sconto)).innerHTML > 0) {
+                ordini.push({"id" : id, "nome" : nome, "cond" : cond, "sconto" : sconto, "quantita" : 1});
                 ok = true;
             } else {
                 alert("Disponibilità terminata");
@@ -175,39 +175,26 @@ function addToCart(id, nome) {
 function updateCart() {
     var ordini = Cookies.getJSON("ordini");
     var table = document.getElementById("carrello_aside_table");
-    var table2 = document.getElementById("carrello_page_table");
     var l = table.rows.length;
     var i = 0;
     for (i=0; i<l; i++) {
         table.deleteRow(0);
-        if (table2 !== null) {
-            table2.deleteRow(0);
-        }
     }
     var head = table.insertRow(0);
     head.innerHTML = "<th>Prodotti</br>nel carrello</th>";
-    if (table2 !== null) {
-        var head2 = table2.insertRow(0);
-        head2.innerHTML = "<th>Prodotti nel carrello</th>";
-    }
     if (ordini !== undefined) {
         for(i=0; i<ordini.length; i++) {
             var row = table.insertRow(i+1);
             var cell = row.insertCell(0);
-            cell.innerHTML = ordini[i]["quantita"] + " x " + ordini[i]["nome"];
-            if (table2 !== null) {
-                var row2 = table2.insertRow(i+1);
-                var cell2 = row2.insertCell(0);
-                cell2.innerHTML = ordini[i]["quantita"] + " x " + ordini[i]["nome"];
+            cell.innerHTML = ordini[i]["quantita"] + " x " + ordini[i]["nome"] + " (" + ordini[i]["cond"];
+            if (ordini[i]['sconto'] != 0) {
+                cell.innerHTML = cell.innerHTML.concat(", -" + ordini[i]["sconto"] + "%");
             }
+            cell.innerHTML = cell.innerHTML.concat(") ");
         }
     } else {
         var empty = table.insertRow(1);
         empty.innerHTML = "<td>Nessun Prodotto</td>";
-        if (table2 !== null) {
-            var empty2 = table2.insertRow(1);
-            empty2.innerHTML = "<td>Nessun Prodotto</td>";
-        }
     }
 }
 

@@ -14,6 +14,9 @@ include("header_full.html");
             if ($db) {
                 if (isset($_POST["submit"])) {
                     switch ($_POST["submit"]) {
+                        case "Aggiorna Ordine":
+                            $result = $db->query("UPDATE Acquisto SET Stato = '$_POST[stato]' WHERE Acquisto.Prodotto = $_POST[ID] AND Acquisto.Cliente = '$_POST[Cliente]' AND Acquisto.Data = '$_POST[Data]'");
+                            break;
                         case "Cancella":
                             $result = $db->query("DELETE FROM Vendite WHERE id_prodotto = $_POST[id] ");
                             if ($result) {
@@ -35,6 +38,7 @@ include("header_full.html");
                     echo "<h3>Operazione eseguita correttamente!</h3>";
                 } else {
                     echo "<h3>Errore nella query</h3>";
+                    echo $db->error;
                 }
                 $db->close();
             } else {

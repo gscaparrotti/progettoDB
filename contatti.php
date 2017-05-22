@@ -42,12 +42,12 @@
         if(!$db) {
           echo "connection failed: ".mysqli_connect_error();
         } else {
-          $result = $db->query("SELECT * FROM Prodotti");
+          $result = $db->query("SELECT * FROM Prodotto");
           if($result && $result->num_rows > 0) {
             echo "<select id='prodotto_contatti' name='tipo'>";
             echo "<option value='0'>(Nessuno)</option>";
             while($row = $result->fetch_assoc()) {
-              echo "<option value='$row[id]'>$row[nome]</option>";
+              echo "<option value='$row[Codice]'>$row[Produttore] $row[Nome]</option>";
             }
             echo "</select>";
             echo "</label>";

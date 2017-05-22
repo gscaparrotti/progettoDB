@@ -6,10 +6,10 @@
     $allowed = true;
     mysqli_set_charset($db, "utf8");
     if ($_POST != null) {
-      if (isset($_POST['ordina']) && ($_POST['ordina'] == "nome" || $_POST['ordina'] == "reg_date" || $_POST['ordina'] == "costo")) {
+      if (isset($_POST['ordina']) && ($_POST['ordina'] == "Nome" || $_POST['ordina'] == "Costo")) {
         $ordina = $_POST['ordina'];
       } else {
-        $ordina = "nome";
+        $ordina = "Nome";
       }
       if (isset($_POST['ricerca'])) {
         if (preg_match("/^\S*$/", $_POST["ricerca"])) {
@@ -28,21 +28,24 @@
       } else {
         $offset = 0;
       }
-      $part1 = "SELECT SQL_CALC_FOUND_ROWS * FROM Prodotti
-                            INNER JOIN Vendite
-                            ON Prodotti.id=Vendite.id_prodotto ";
+      $part1 = "SELECT SQL_CALC_FOUND_ROWS Prodotto.Codice, Prodotto.Produttore, Prodotto.Nome, Prodotto.img, Prodotto.Costo, Count(NULLIF(1, ProdottoInNegozio.Venduto)) as disponibile
+                from Prodotto inner join ProdottoInNegozio
+                on Prodotto.Codice = ProdottoInNegozio.Prodotto ";
       $part2 = "WHERE ";
-      $part3 = "LOWER(nome) LIKE LOWER($filter) ";
+      $part3 = "LOWER(Nome) LIKE LOWER($filter) ";
+      $part9 = "ProdottoInNegozio.Venduto = 0 ";
+      $part8 = "LOWER(Produttore) LIKE LOWER($filter) ";;
       $part4 = "AND ";
-      $part5 = "disponibile > 0
-                ORDER BY $ordina ASC
+      $part7 = "OR ";
+      $part5 = "ORDER BY $ordina ASC
                 LIMIT $max
                 OFFSET $offset;";
+      $part6 = "GROUP BY Prodotto.Codice ";
       //echo $part1.$part2.$part3;
       if (!$filter) {
-        $result = $db->query($part1.$part2.$part5);
+        $result = $db->query($part1.$part6.$part5);
       } else {
-        $result = $db->query($part1.$part2.$part3.$part4.$part5);
+        $result = $db->query($part1.$part2.$part3.$part7.$part8.$part6.$part5);
       }
       $rows_count = $db->query("SELECT FOUND_ROWS();");
     }
@@ -52,12 +55,12 @@
       }
       if ($result->num_rows > 0) {
         while($row = $result->fetch_assoc()) { ?>
-          <table id="<?php echo $row["id_prodotto"]?>" class="tabella_prodotti">
-            <?php if($row["img"] != null) { ?>
+          <table id="<?php echo $row["Codice"]?>" class="tabella_prodotti">
+            <?php if(isset($row["img"]) && $row["img"] != null) { ?>
               <tr><td class="prdt_img_row"><img class="prdt_img" alt="immagine del prodotto" src="<?php echo $row["img"]; ?>"></td></tr>
             <?php } ?>
-            <tr><td><?php echo $row["nome"]; ?></td></tr>
-            <tr><td><?php echo $row["costo"]. " €"; ?></td></tr>
+            <tr><td><?php echo $row["Produttore"]." ".$row["Nome"]; ?></td></tr>
+            <tr><td><?php echo 'Prezzo di Listino: '.$row["Costo"]. " €"; ?></td></tr>
             <tr><td><?php echo $row["disponibile"];
                       if ($row["disponibile"] == 1) {
                         echo " pezzo disponibile";

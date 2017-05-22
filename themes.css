@@ -157,9 +157,11 @@ input, textarea {
 }
 
 .dettagli_bottom {
-    margin: auto;
+    margin: 3vh;
     display: inline-block;
-    margin-bottom: 3vh;
+    border:solid thin;
+    border-radius: 1vh;
+    padding: 1vh;
 }
 
 .descrizione {
@@ -223,6 +225,7 @@ input, textarea {
 }
 
 .secret_element {
+    margin:auto;
     margin-bottom: 3vh;
 }
 
@@ -238,6 +241,10 @@ input, textarea {
 #secret_buttons {
     margin-top: 2vh;
     margin-bottom: 2vh;
+}
+
+#secret_buttons input{
+    width: auto;
 }
 
 #titolo {

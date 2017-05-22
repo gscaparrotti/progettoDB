@@ -41,49 +41,58 @@ include("header_full.html");
                 }
                 if ($db != null) { ?>
                     <form id="secret_buttons" method="get">
-                        <input type="submit" name="show" value="Mostra Ordini"/>
-                        <input type="submit" name="show" value="Mostra Commenti"/>
-                        <input type="submit" name="show" value="Mostra Clienti"/>
-                        <input type="submit" name="show" value="Aggiorna disponibilità"/>
-                        <input type="submit" name="show" value="Aggiungi Prodotto"/>
-                        <input type="submit" name="show" value="Rimuovi Prodotto"/>
-                        <input type="submit" name="show" value="Aggiungi Categoria"/>
+                        Selezionare l'azione da eseguire:
+                        <select name="show" form="secret_buttons">
+                            <option value="Mostra Ordini">Mostra Ordini</option>
+                            <option value="Mostra Commenti">Mostra Commenti</option>
+                            <option value="Mostra Clienti">Mostra Clienti</option>
+                            <option value="Aggiungi Prodotto">Aggiungi Prodotto</option>
+                            <option value="Rimuovi Prodotto">Rimuovi Prodotto</option>
+                            <option value="Aggiungi Prodotto in Negozio">Aggiungi Prodotto in Negozio</option>
+                            <option value="Rimuovi Prodotto in Negozio">Rimuovi Prodotto in Negozio</option>
+                            <option value="Aggiungi Fornitura">Aggiungi Fornitura</option>
+                            <option value="Aggiungi Fornitore">Aggiungi Fornitore</option>
+                        </select>
+                        <input id="submit_secret_buttons" type="submit" value="Invio">
                     </form>
                     <?php
                     if (isset($_GET["show"])) {
+                        echo "<h2>$_GET[show]</h2>";
                         switch ($_GET["show"]) {
                             case ("Mostra Ordini"): ?>
                                 <table class="secret_element" id="tabella_ordini" style="">
-                                    <?php $result = $db->query("SELECT time, Cliente.nome, cognome, citta, indirizzo, telefono, Cliente.email, codice_carta, scadenza_carta, sic_carta, Prodotti.nome, prodotto, quantita
-                                    FROM (Acquisto INNER JOIN Cliente
-                                    ON Acquisto.email = Cliente.email) INNER JOIN Prodotti
-                                    ON Acquisto.prodotto = Prodotti.id
-                                    ORDER BY time DESC");
+                                    <?php $result = $db->query("SELECT ProdottoInNegozio.ID as 'Prodotto in Negozio', Acquisto.Cliente, Acquisto.Data, Prodotto.Costo, ProdottoInNegozio.Sconto, Acquisto.Pagamento, Acquisto.Stato FROM Acquisto
+                                                                      INNER JOIN ProdottoInNegozio ON Acquisto.Prodotto = ProdottoInNegozio.ID
+                                                                      INNER JOIN Prodotto on ProdottoInNegozio.Prodotto = Prodotto.Codice");
                                     if ($result) {
                                         $fields = $result->fetch_fields();
+                                        $assoc = $result->fetch_all(MYSQLI_ASSOC);
+                                        $result->data_seek(0);
                                         ?>
                                         <tr>
                                             <?php for ($i=0; $i<sizeof($fields); $i++) {
                                                 echo "<th>".$fields[$i]->name."</th>";
                                             } ?>
                                         </tr>
-                                        <?php while($row = $result->fetch_row()) {
+                                        <?php
+                                        $current_row = 0;
+                                        while($row = $result->fetch_row()) {
                                             echo "<tr>";
-                                            for ($i=0; $i<sizeof($row) - 2; $i++) {
+                                            for ($i=0; $i<sizeof($row); $i++) {
                                                 echo "<td>".$row[$i]."</td>";
-                                            }
-                                            $prodotti = $row[sizeof($row) - 2];
-                                            echo "<td>";
-                                            for ($i = 0; $i<sizeof($prodotti);$i++) {
-                                                echo "<p class='product_in_row'>".$prodotti[$i]."</p>";
-                                                if ($i < sizeof($prodotti) - 1) {
-                                                    echo "<p> , </p>";
-                                                }
-                                            }
-                                            echo "</td>";
-                                            echo "<td>";
-                                            echo $row[sizeof($row) - 1];
-                                            echo "</td>";
+                                            };?>
+                                            <td>
+                                                <form action='do_query.php' method="post" enctype="multipart/form-data">
+                                                    Nuovo stato ordine:<br>
+                                                    <input type="text" name="stato"><br>
+                                                    <input type="hidden" name="ID" value="<?php echo $assoc[$current_row]['Prodotto in Negozio'] ?>">
+                                                    <input type="hidden" name="Cliente" value="<?php echo $assoc[$current_row]['Cliente'] ?>">
+                                                    <input type="hidden" name="Data" value="<?php echo $assoc[$current_row]['Data'] ?>">
+                                                    <input type="submit" value="Aggiorna Ordine" name="submit">
+                                                </form>
+                                            </td>
+                                            <?php
+                                            $current_row++;
                                             echo "</tr>";
                                         }
                                     } ?>
@@ -91,41 +100,41 @@ include("header_full.html");
                                 <?php break;
                             case ("Mostra Commenti"): ?>
                                 <table class="secret_element" id="tabella_commenti" style="">
-                                    <?php $result = $db->query("SELECT * FROM Commenti");
+                                    <?php $result = $db->query("SELECT Commenti.nickname as Nickname, Commenti.email as Email, Commenti.commento as Commento, Prodotto.Produttore, Prodotto.Nome, Prodotto.Codice FROM Commenti INNER JOIN Prodotto ON Commenti.id_prodotto = Prodotto.Codice");
                                     $result2 = $db->query("SELECT id, nome FROM Prodotti");
-                                    if ($result && $result2) {
+                                    if ($result) {
                                         $fields = $result->fetch_fields();
-                                        $products;
-                                        while ($row = $result2->fetch_assoc()) {
-                                            $products[$row['id']] = $row['nome'];
-                                        }
-                                    } ?>
+                                    }?>
                                     <tr>
                                         <?php for ($i=0; $i<sizeof($fields) - 1; $i++) {
                                             echo "<th>".$fields[$i]->name."</th>";
-                                        }
-                                        echo "<th>prodotto</th>";?>
+                                        } ?>
                                     </tr>
-                                    <?php while($row = $result->fetch_row()) {
+                                    <?php
+                                    while($row = $result->fetch_row()) {
                                         echo "<tr>";
                                         for ($i=0; $i<sizeof($row) - 1; $i++) {
                                             echo "<td>".$row[$i]."</td>";
-                                        }
-                                        if ($row[sizeof($row) - 1] > 0 ) {
-                                            echo "<td>";
-                                            echo "<p class='product_in_row'>".$row[$i]."</p>";
-                                            echo "</td>";
-                                        }
+                                        } ?>
+                                        <td>
+                                            <form action="pagina.php#params[id]=<?php echo $row[$i]; ?>&url=dettaglio.php">
+                                                <input type="submit" value="Visualizza Prodotto" />
+                                            </form>
+                                        </td>;
+                                        <?php
                                         echo "</tr>";
                                     } ?>
                                 </table>
                                 <?php break;
                             case ("Mostra Clienti"): ?>
                                 <table class="secret_element" id="tabella_clenti" style="">
-                                    <?php $result = $db->query("SELECT * FROM Cliente");
+                                    <?php $result = $db->query("SELECT `E-Mail`, Nome, Cognome, CAP, Citta, Via, Civico, Tipo as 'Metodo Pagamento', Codice, Scadenza, CodSicurezza From Cliente INNER JOIN MetodoPagamento");
                                     if ($result) {
                                         $fields = $result->fetch_fields();
-                                    } ?>
+                                    }
+                                    else {
+                                        echo $db->error;
+                                    }?>
                                     <tr>
                                         <?php for ($i=0; $i<sizeof($fields); $i++) {
                                             echo "<th>".$fields[$i]->name."</th>";
@@ -235,16 +244,27 @@ include("header_full.html");
                                     </fieldset>
                                 </form>
                                 <?php break;
-                            case ("Aggiungi Categoria"): ?>
-                                <form class="secret_element" id="category_upload1" action='do_query.php' method="post" enctype="multipart/form-data">
-                                    <fieldset class="upload_fieldset" id="new_categogry_fieldset">
-                                        <label>Nome cateogria:
-                                            <input id="nome_categoria" name="nome" placeholder="Nome" required=""/>
-                                        </label>
-                                        <label>Descrizione:
-                                            <textarea id="caratteristiche_categoria" name="caratteristiche" placeholder="caratteristiche"required="required"></textarea>
-                                        </label>
-                                        <input id="submit_button" type="submit" value="Aggiungi Categoria" name="submit">
+                            case ("Aggiungi Prodotto in Negozio"): ?>
+                                <form class="secret_element" id="add_in_negozio_form" action='do_query.php' method="post" enctype="multipart/form-data">
+                                    <fieldset class="upload_fieldset" id="delete_fieldset">
+                                        <?php
+                                        if(!$db) {
+                                            echo "connection failed: ".mysqli_connect_error();
+                                        } else {
+                                            $result = $db->query("SELECT Codice, Nome, Produttore FROM Prodotto");
+                                            if($result && $result->num_rows > 0) {
+                                                echo "<label>Prodotto di Riferimento: ";
+                                                echo "<select name='id' form='add_in_negozio_form'>";
+                                                while($row = $result->fetch_assoc()) {
+                                                    echo "<option value='$row[Codice]'>$row[Produttore] $row[Nome]</option>";
+                                                }
+                                                echo "</select>";
+                                                echo "</label>";
+                                                $db->close();
+                                            }
+                                        }
+                                        ?>
+                                        <input id="submit_button2" type="submit" value="ProdottoInNegozio" name="submit">
                                     </fieldset>
                                 </form>
                                 <?php break;
