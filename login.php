@@ -117,10 +117,10 @@ include("header_full.html");
                                             echo "<td>".$row[$i]."</td>";
                                         } ?>
                                         <td>
-                                            <form action="pagina.php#params[id]=<?php echo $row[$i]; ?>&url=dettaglio.php">
+                                            <form action="pagina.php#params[id]=<?php echo $row[$i] ?>&url=dettaglio.php">
                                                 <input type="submit" value="Visualizza Prodotto" />
                                             </form>
-                                        </td>;
+                                        </td>
                                         <?php
                                         echo "</tr>";
                                     } ?>
