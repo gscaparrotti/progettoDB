@@ -238,6 +238,10 @@ input, textarea {
     display: inline;
 }
 
+.ampli, .diff, .lettore, .type {
+    display: none !important;
+}
+
 #secret_buttons {
     margin-top: 2vh;
     margin-bottom: 2vh;
@@ -333,6 +337,7 @@ input, textarea {
 }
 
 #upload_fieldset {
+    margin:auto;
     width: 50vw;
     text-align: center;
     border: none;

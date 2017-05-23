@@ -178,8 +178,11 @@ include("header_full.html");
                             case ("Aggiungi Prodotto"): ?>
                                 <form class="secret_element" id="upload" action='file_upload.php' method="post" enctype="multipart/form-data">
                                     <fieldset id="upload_fieldset">
-                                        <label>Numero del codice a barre:
+                                        <label>Codice (a barre):
                                             <input name="id" type="number" step="1" min="0" placeholder="" required=""/>
+                                        </label>
+                                        <label>Nome del produttore:
+                                            <input name="nome" placeholder="Nome" required=""/>
                                         </label>
                                         <label>Nome del prodotto:
                                             <input name="nome" placeholder="Nome" required=""/>
@@ -187,31 +190,38 @@ include("header_full.html");
                                         <label>Prezzo del prodotto:
                                             <input name="costo" type="number" step="0.01" min="0" placeholder="Prezzo" required=""/>
                                         </label>
-                                        <label>Disponibilità:
-                                            <input name="disp" type="number" step="1" min="0" placeholder="Disponibilità" required=""/>
-                                        </label>
                                         <label>Descrizione:
                                             <textarea name="desc" placeholder="Descrizione"required="required"></textarea>
                                         </label>
-                                        <label>Caratteristiche:
-                                            <textarea name="car" placeholder="Caratteristiche"required="required"></textarea>
+                                        <label>Tipo Prodotto:
+                                        <select id="type_select" onchange="type_change(this);" name='tipo' form='upload'>
+                                            <option value=0>Altro</option>
+                                            <option value=1>Amplificatore</option>
+                                            <option value=2>Diffusore</option>
+                                            <option value=3>Lettore Multimediale</option>
+                                        </select>
                                         </label>
-                                        <?php
-                                        if(!$db) {
-                                            echo "connection failed: ".mysqli_connect_error();
-                                        } else {
-                                            $result = $db->query("SELECT * FROM Tipo_Prodotti");
-                                            if($result && $result->num_rows > 0) {
-                                                echo "<label>Tipo Prodotto: ";
-                                                echo "<select name='tipo' form='upload'>";
-                                                while($row = $result->fetch_assoc()) {
-                                                    echo "<option value='$row[nome]'>$row[nome]</option>";
-                                                }
-                                                echo "</select>";
-                                                echo "</label>";
-                                            }
-                                        }
-                                        ?>
+                                        <label class="ampli type">Potenza:
+                                            <input name="potenza" placeholder="Potenza"/>
+                                        </label>
+                                        <label class="ampli type">Risposta in Frequenza:
+                                            <input name="rip" placeholder="Risposta in Frequenza"/>
+                                        </label>
+                                        <label class="diff type">Potenza Massima:
+                                            <input name="potmax" placeholder="Potenza Massima"/>
+                                        </label>
+                                        <label class="diff type">Numero Vie:
+                                            <input name="nvie" placeholder="Numero Vie"/>
+                                        </label>
+                                        <label class="lettore type">Formati Supportati:
+                                            <input name="formati" placeholder="Formati Supportati"/>
+                                        </label>
+                                        <label class="lettore type">DAC:
+                                            <input name="dac" placeholder="DAC"/>
+                                        </label>
+                                        <label class="lettore type">Uscite:
+                                            <input name="uscite" placeholder="Uscite"/>
+                                        </label>
                                         <label>
                                             Select image to upload:
                                             <input type="file" name="fileToUpload" id="fileToUpload" required="">

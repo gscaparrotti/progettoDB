@@ -55,3 +55,14 @@ $(document).ready(function() {
       }
   });
 });
+
+function type_change(select) {
+    $(".type").css('cssText', "display:none !important");
+    if (select.value == 1) {
+        $(".ampli").css('cssText', "display:flex !important");
+    } else if (select.value == 2) {
+        $(".diff").css('cssText', "display:flex !important");
+    } else if (select.value == 3) {
+        $(".lettore").css('cssText', "display:flex !important");
+    }
+}
