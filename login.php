@@ -182,7 +182,7 @@ include("header_full.html");
                                             <input name="id" type="number" step="1" min="0" placeholder="" required=""/>
                                         </label>
                                         <label>Nome del produttore:
-                                            <input name="nome" placeholder="Nome" required=""/>
+                                            <input name="produttore" placeholder="Produttore" required=""/>
                                         </label>
                                         <label>Nome del prodotto:
                                             <input name="nome" placeholder="Nome" required=""/>
@@ -202,16 +202,19 @@ include("header_full.html");
                                         </select>
                                         </label>
                                         <label class="ampli type">Potenza:
-                                            <input name="potenza" placeholder="Potenza"/>
+                                            <input name="potenza" type="number" placeholder="Potenza"/>
                                         </label>
                                         <label class="ampli type">Risposta in Frequenza:
-                                            <input name="rip" placeholder="Risposta in Frequenza"/>
+                                            <input name="rif" placeholder="Risposta in Frequenza"/>
+                                        </label>
+                                        <label class="ampli type">Risposta in Frequenza:
+                                            <input name="ningressi" type="number" placeholder="Numero Ingressi"/>
                                         </label>
                                         <label class="diff type">Potenza Massima:
-                                            <input name="potmax" placeholder="Potenza Massima"/>
+                                            <input name="potmax" type="number" placeholder="Potenza Massima"/>
                                         </label>
                                         <label class="diff type">Numero Vie:
-                                            <input name="nvie" placeholder="Numero Vie"/>
+                                            <input name="nvie" type="number" placeholder="Numero Vie"/>
                                         </label>
                                         <label class="lettore type">Formati Supportati:
                                             <input name="formati" placeholder="Formati Supportati"/>

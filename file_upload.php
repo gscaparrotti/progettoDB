@@ -40,23 +40,28 @@
           //print_r($_SESSION);
           $db = mysqli_connect("localhost", $_SESSION["user"], $_SESSION["password"] != null ? $_SESSION["password"] : "", "progetto");
           if ($db) {
-            $result = $db->query("INSERT INTO Prodotti(id, tipo_prodotto, nome, costo, img, descrizione, caratteristiche)
-                                  VALUES ('".$_POST['id']."','".$_POST['tipo']."','".$_POST['nome']."','".$_POST['costo']."','".$target_file."','".$_POST['desc']."','"
-                                  .$_POST['car']."');");
+              $_POST['potenza'] != null ? $potenza = $_POST['potenza'] : $potenza = "NULL";
+              $_POST['rif'] != null ? $rif = $_POST['rif'] : $rif = "NULL";
+              $_POST['ningressi'] != null ? $ningressi = $_POST['ningressi'] : $ningressi = "NULL";
+              $_POST['potmax'] != null ? $potmax = $_POST['potmax'] : $potmax = "NULL";
+              $_POST['nvie'] != null ? $nvie = $_POST['nvie'] : $nvie = "NULL";
+              $_POST['formati'] != null ? $formati = $_POST['formati'] : $formati = "NULL";
+              $_POST['dac'] != null ? $dac = $_POST['dac'] : $dac = "NULL";
+              $_POST['uscite'] != null ? $uscite = $_POST['uscite'] : $uscite = "NULL";
+            $result = $db->query("INSERT INTO Prodotto (Codice, Costo, Descrizione, Produttore, Nome, img, Tipo, Potenza, RiF, N_Ingressi, Pot_Max, N_Vie, Formati, Dac, Uscita) 
+                                        VALUES ('$_POST[id]', '$_POST[costo]', '$_POST[desc]', '$_POST[produttore]', '$_POST[nome]', '$target_file', '$_POST[tipo]', 
+                                        '$potenza', '$rif', '$ningressi', '$potmax', '$nvie', '$formati', '$dac', '$uscite')");
             if ($result) {
-              $result2 = $db->query("INSERT INTO Vendite(id_prodotto, disponibile, venduti)
-                                    VALUES ('".$_POST['id']."','".$_POST['disp']."','0')");
-            } else {
-              echo "<h1>Errore</h1>";
-            }
-            $db->close();
-            if ($result2) {
               echo "<h3>Prodotto aggiunto correttamente!</h3>";
             } else {
-              echo "<h3>Errore</h3>";
+              echo "<h3>Errore Query</h3>";
+              echo $db->error;
+              echo $db->errno;
+
             }
+            $db->close();
           } else {
-            echo "<h3>Errore</h3>";
+            echo "<h3>Errore DB</h3>";
           }
 //          session_unset();
 //          session_destroy();
