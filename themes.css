@@ -242,6 +242,23 @@ input, textarea {
     display: none !important;
 }
 
+#delete_fieldset > label {
+    margin: auto;
+    margin-bottom: 2vh;
+    text-align: center;
+    width: 25vw;
+    justify-content: space-between;
+    display: flex;
+}
+
+#show_orders > label {
+    margin: auto;
+    text-align: center;
+    width: auto;
+    justify-content: space-between;
+    display: flex;
+}
+
 #secret_buttons {
     margin-top: 2vh;
     margin-bottom: 2vh;
@@ -375,4 +392,8 @@ input, textarea {
     margin: auto;
     text-align: center;
     border: none;
+}
+
+#submit_button2 {
+    width: auto;
 }

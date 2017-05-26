@@ -48,10 +48,13 @@ include("header_full.html");
                             <option value="Mostra Clienti">Mostra Clienti</option>
                             <option value="Aggiungi Prodotto">Aggiungi Prodotto</option>
                             <option value="Rimuovi Prodotto">Rimuovi Prodotto</option>
+                            <option value="Aggiungi Ordinazione Prodotto">Aggiungi Ordinazione Prodotto</option>
+                            <option value="Mostra/Modifica Ordinazioni Prodotto">Mostra/Modifica Ordinazioni Prodotto</option>
                             <option value="Aggiungi Prodotto in Negozio">Aggiungi Prodotto in Negozio</option>
                             <option value="Rimuovi Prodotto in Negozio">Rimuovi Prodotto in Negozio</option>
                             <option value="Aggiungi Fornitura">Aggiungi Fornitura</option>
                             <option value="Aggiungi Fornitore">Aggiungi Fornitore</option>
+                            <option value="Rimuovi Fornitore">Rimuovi Fornitore</option>
                         </select>
                         <input id="submit_secret_buttons" type="submit" value="Invio">
                     </form>
@@ -101,7 +104,6 @@ include("header_full.html");
                             case ("Mostra Commenti"): ?>
                                 <table class="secret_element" id="tabella_commenti" style="">
                                     <?php $result = $db->query("SELECT Commenti.nickname as Nickname, Commenti.email as Email, Commenti.commento as Commento, Prodotto.Produttore, Prodotto.Nome, Prodotto.Codice FROM Commenti INNER JOIN Prodotto ON Commenti.id_prodotto = Prodotto.Codice");
-                                    $result2 = $db->query("SELECT id, nome FROM Prodotti");
                                     if ($result) {
                                         $fields = $result->fetch_fields();
                                     }?>
@@ -194,12 +196,12 @@ include("header_full.html");
                                             <textarea name="desc" placeholder="Descrizione"required="required"></textarea>
                                         </label>
                                         <label>Tipo Prodotto:
-                                        <select id="type_select" onchange="type_change(this);" name='tipo' form='upload'>
-                                            <option value=0>Altro</option>
-                                            <option value=1>Amplificatore</option>
-                                            <option value=2>Diffusore</option>
-                                            <option value=3>Lettore Multimediale</option>
-                                        </select>
+                                            <select id="type_select" onchange="type_change(this);" name='tipo' form='upload'>
+                                                <option value=0>Altro</option>
+                                                <option value=1>Amplificatore</option>
+                                                <option value=2>Diffusore</option>
+                                                <option value=3>Lettore Multimediale</option>
+                                            </select>
                                         </label>
                                         <label class="ampli type">Potenza:
                                             <input name="potenza" type="number" placeholder="Potenza"/>
@@ -240,12 +242,13 @@ include("header_full.html");
                                         if(!$db) {
                                             echo "connection failed: ".mysqli_connect_error();
                                         } else {
-                                            $result = $db->query("SELECT id, nome FROM Prodotti");
+                                            $result = $db->query("SELECT Codice, Produttore, Nome FROM Prodotto");
                                             if($result && $result->num_rows > 0) {
                                                 echo "<label>Prodotto: ";
                                                 echo "<select name='id' form='delete_form'>";
                                                 while($row = $result->fetch_assoc()) {
-                                                    echo "<option value='$row[id]'>$row[nome]</option>";
+                                                    $prod = $row[Produttore].' '.$row[Nome];
+                                                    echo "<option value='$row[Codice]'>$prod</option>";
                                                 }
                                                 echo "</select>";
                                                 echo "</label>";
@@ -253,11 +256,11 @@ include("header_full.html");
                                             }
                                         }
                                         ?>
-                                        <input id="submit_button2" type="submit" value="Cancella" name="submit">
+                                        <input id="submit_button2" type="submit" value="Cancella Prodotto" name="submit">
                                     </fieldset>
                                 </form>
                                 <?php break;
-                            case ("Aggiungi Prodotto in Negozio"): ?>
+                            case ("Aggiungi Ordinazione Prodotto"): ?>
                                 <form class="secret_element" id="add_in_negozio_form" action='do_query.php' method="post" enctype="multipart/form-data">
                                     <fieldset class="upload_fieldset" id="delete_fieldset">
                                         <?php
@@ -267,9 +270,104 @@ include("header_full.html");
                                             $result = $db->query("SELECT Codice, Nome, Produttore FROM Prodotto");
                                             if($result && $result->num_rows > 0) {
                                                 echo "<label>Prodotto di Riferimento: ";
-                                                echo "<select name='id' form='add_in_negozio_form'>";
-                                                while($row = $result->fetch_assoc()) {
+                                                echo "<select name='prodotto' form='add_in_negozio_form'>";
+                                                while ($row = $result->fetch_assoc()) {
                                                     echo "<option value='$row[Codice]'>$row[Produttore] $row[Nome]</option>";
+                                                }
+                                                echo "</select>";
+                                                echo "</label>";
+                                            }
+                                            $result = $db->query("SELECT * FROM Fornitura INNER JOIN Fornitore ON Fornitura.Fornitore = Fornitore.PIVA");
+                                            if($result && $result->num_rows > 0) {
+                                                echo "<label>Fornitura di appartenenza: ";
+                                                echo "<select name='fornitura' form='add_in_negozio_form'>";
+                                                while($row = $result->fetch_assoc()) {
+                                                    echo "<option value='$row[Fornitore]?$row[Data]'>$row[Ragionesociale] - $row[Data]</option>";
+                                                }
+                                                echo "</select>";
+                                                echo "</label>";
+                                                $db->close();
+                                            } ?>
+                                            <label>Quantità:
+                                                <input name="quantita" type="number" step="1" min="0" placeholder="" required=""/>
+                                            </label>
+                                            <?php
+                                        }
+                                        ?>
+                                        <input id="submit_button2" type="submit" value="Aggiungi Ordinazione Prodotto" name="submit">
+                                    </fieldset>
+                                </form>
+                                <?php break;
+                            case ("Mostra/Modifica Ordinazioni Prodotto"): ?>
+                                <table class="secret_element" id="tabella_ordini" style="">
+                                    <?php $result = $db->query("SELECT Ragionesociale as Fornitore, PIVA, Data, Produttore, Nome, Quantita, Codice FROM Ordinare INNER JOIN Fornitore ON Ordinare.Fornitore = Fornitore.PIVA INNER JOIN Prodotto ON Ordinare.Prodotto = Prodotto.Codice ORDER BY Data DESC");
+                                    if ($result) {
+                                        $fields = $result->fetch_fields();
+                                        $assoc = $result->fetch_all(MYSQLI_ASSOC);
+                                        $result->data_seek(0);
+                                        ?>
+                                        <tr>
+                                            <?php for ($i=0; $i<sizeof($fields) - 1; $i++) {
+                                                echo "<th>".$fields[$i]->name."</th>";
+                                            } ?>
+                                        </tr>
+                                        <?php
+                                        $current_row = 0;
+                                        while($row = $result->fetch_row()) {
+                                            $codice = $assoc[$current_row]['Codice'];
+                                            $piva = $assoc[$current_row]['PIVA'];
+                                            $data = $assoc[$current_row]['Data'];
+                                            $amount = $db->query("SELECT COUNT(*) AS amount FROM ProdottoInNegozio WHERE Prodotto = $codice AND Fornitore = $piva AND DataFornitura = '$data'")->fetch_assoc()['amount'];
+                                            $quantita = $assoc[$current_row]['Quantita'] - $amount;
+                                            echo "<tr>";
+                                            for ($i=0; $i<sizeof($row) - 1; $i++) {
+                                                echo "<td>".$row[$i]."</td>";
+                                            };?>
+                                            <td>
+                                                <form id="show_orders" action='do_query.php' method="post" enctype="multipart/form-data">
+                                                    <label>
+                                                        Condizione:
+                                                        <input type="text" name="condizione" <?php echo $quantita == 0 ? 'disabled' : ''; ?>>
+                                                    </label>
+                                                    <label>
+                                                        Sconto (%):
+                                                        <input type="number" name="sconto" <?php echo $quantita == 0 ? 'disabled' : ''; ?>>
+                                                    </label>
+                                                    <label>
+                                                        Durata Garanzia:
+                                                        <input type="number" name="garanzia" <?php echo $quantita == 0 ? 'disabled' : ''; ?>>
+                                                    </label>
+                                                    <input type="hidden" name="Fornitore" value="<?php echo $assoc[$current_row]['PIVA']; echo $quantita == 0 ? 'disabled' : ''; ?>">
+                                                    <input type="hidden" name="Data" value="<?php echo $assoc[$current_row]['Data']; echo $quantita == 0 ? 'disabled' : ''; ?>">
+                                                    <input type="hidden" name="Prodotto" value="<?php echo $assoc[$current_row]['Codice']; echo $quantita == 0 ? 'disabled' : ''; ?>">
+                                                    <input type="hidden" name="Quantita" value="<?php echo $quantita; echo $quantita == 0 ? 'disabled' : ''; ?>">
+                                                    <?php if ($quantita > 0) { ?>
+                                                        <input type="submit" value="Aggiungi Prodotto in Negozio" name="submit" style="width: 100%;">
+                                                    <?php } else { ?>
+                                                        <input type="submit" value="Prodotto già aggiunto" name="submit" style="width: 100%;" disabled>
+                                                    <?php } ?>
+                                                </form>
+                                            </td>
+                                            <?php
+                                            $current_row++;
+                                            echo "</tr>";
+                                        }
+                                    } ?>
+                                </table>
+                                <?php break;
+                            case ("Aggiungi Fornitura"): ?>
+                                <form class="secret_element" id="add_fornitura_form" action='do_query.php' method="post" enctype="multipart/form-data">
+                                    <fieldset class="upload_fieldset" id="delete_fieldset">
+                                        <?php
+                                        if(!$db) {
+                                            echo "connection failed: ".mysqli_connect_error();
+                                        } else {
+                                            $result = $db->query("SELECT PIVA, Ragionesociale FROM Fornitore");
+                                            if($result && $result->num_rows > 0) {
+                                                echo "<label>Fornitore: ";
+                                                echo "<select name='piva' form='add_fornitura_form'>";
+                                                while($row = $result->fetch_assoc()) {
+                                                    echo "<option value='$row[PIVA]'>$row[Ragionesociale]</option>";
                                                 }
                                                 echo "</select>";
                                                 echo "</label>";
@@ -277,7 +375,57 @@ include("header_full.html");
                                             }
                                         }
                                         ?>
-                                        <input id="submit_button2" type="submit" value="ProdottoInNegozio" name="submit">
+                                        <input id="submit_button2" type="submit" value="Aggiungi Fornitura" name="submit">
+                                    </fieldset>
+                                </form>
+                                <p>La fornitura verrà aggiunta con la data e l'ora attuali</p>
+                                <?php break;
+                            case ("Aggiungi Fornitore"): ?>
+                                <form class="secret_element" id="aggiungi_fornitore" action='do_query.php' method="post" enctype="multipart/form-data">
+                                    <fieldset id="upload_fieldset">
+                                        <label>Partita IVA:
+                                            <input name="piva" type="number" required=""/>
+                                        </label>
+                                        <label>Ragione Sociale:
+                                            <input name="ragione_sociale" placeholder="Ragione Sociale" required=""/>
+                                        </label>
+                                        <label>CAP:
+                                            <input name="cap" type="number" required=""/>
+                                        </label>
+                                        <label>Città:
+                                            <input name="citta" placeholder="Città" required=""/>
+                                        </label>
+                                        <label>Via:
+                                            <input name="via" placeholder="Via" required=""/>
+                                        </label>
+                                        <label>N. Civico:
+                                            <input name="civico" type="number" required=""/>
+                                        </label>
+                                        <input id="submit_button" type="submit" value="Aggiungi Fornitore" name="submit">
+                                    </fieldset>
+                                </form>
+                                <?php break;
+                            case ("Rimuovi Fornitore"): ?>
+                                <form class="secret_element" id="delete_fornitore_form" action='do_query.php' method="post" enctype="multipart/form-data">
+                                    <fieldset class="upload_fieldset" id="delete_fieldset">
+                                        <?php
+                                        if(!$db) {
+                                            echo "connection failed: ".mysqli_connect_error();
+                                        } else {
+                                            $result = $db->query("SELECT PIVA, Ragionesociale FROM Fornitore");
+                                            if($result && $result->num_rows > 0) {
+                                                echo "<label>Fornitore: ";
+                                                echo "<select name='piva' form='delete_fornitore_form'>";
+                                                while($row = $result->fetch_assoc()) {
+                                                    echo "<option value='$row[PIVA]'>$row[Ragionesociale]</option>";
+                                                }
+                                                echo "</select>";
+                                                echo "</label>";
+                                                $db->close();
+                                            }
+                                        }
+                                        ?>
+                                        <input id="submit_button2" type="submit" value="Cancella Fornitore" name="submit">
                                     </fieldset>
                                 </form>
                                 <?php break;

@@ -13,32 +13,48 @@ include("header_full.html");
             $db = mysqli_connect("localhost", $_SESSION["user"], $_SESSION["password"] != null ? $_SESSION["password"] : "", "progetto");
             if ($db) {
                 if (isset($_POST["submit"])) {
+                    $result = null;
                     switch ($_POST["submit"]) {
                         case "Aggiorna Ordine":
                             $result = $db->query("UPDATE Acquisto SET Stato = '$_POST[stato]' WHERE Acquisto.Prodotto = $_POST[ID] AND Acquisto.Cliente = '$_POST[Cliente]' AND Acquisto.Data = '$_POST[Data]'");
                             break;
-                        case "Cancella":
-                            $result = $db->query("DELETE FROM Vendite WHERE id_prodotto = $_POST[id] ");
-                            if ($result) {
-                                $result = $db->query("DELETE FROM Prodotti WHERE id = $_POST[id] ");
+                        case "Cancella Prodotto":
+                            $result = $db->query("DELETE FROM Prodotto WHERE Codice = '$_POST[id]' ");
+                            break;
+                        case "Aggiungi Ordinazione Prodotto":
+                            $fornitura = explode('?', $_POST['fornitura']);
+                            $result = $db->query("INSERT INTO Ordinare (Fornitore, Data, Prodotto, Quantita) VALUES ('$fornitura[0]', '$fornitura[1]', $_POST[prodotto], $_POST[quantita]);");
+                            break;
+                        case "Aggiungi Prodotto in Negozio":
+                            $amount = $db->query("SELECT COUNT(*) AS amount FROM ProdottoInNegozio WHERE Prodotto = $_POST[Prodotto] AND Fornitore = $_POST[Fornitore] AND DataFornitura = '$_POST[Data]'");
+                            $max_amount = $db->query("SELECT Quantita as max_amount FROM Ordinare WHERE Prodotto = $_POST[Prodotto] AND Fornitore = $_POST[Fornitore] AND Data = '$_POST[Data]'");
+                            if ($amount->fetch_assoc()['amount'] + $_POST['Quantita'] <= $max_amount->fetch_assoc()['max_amount']) {
+                                for ($i = 0; $i < $_POST['Quantita']; $i++) {
+                                    $result = $db->query("INSERT INTO ProdottoInNegozio(Prodotto, Fornitore, DataFornitura, DurataGaranzia, Sconto, Condizione, Venduto) 
+                                                            VALUES ('$_POST[Prodotto]', '$_POST[Fornitore]', '$_POST[Data]', '$_POST[garanzia]', '$_POST[sconto]', '$_POST[condizione]', '0');");
+                                }
                             } else {
-                                echo "<h3>Errore nella prima query</h3>";
-                                $result = null;
+                                echo "<p>Impossibile aggiungere i prodotti selezionati: vincoli non soddisfatti.</p>";
                             }
                             break;
-                        case "Aggiorna Disponibilità":
-                            $result = $db->query("UPDATE Vendite SET disponibile = $_POST[disponibile] WHERE id_prodotto = $_POST[id] ");
+                        case "Aggiungi Fornitura":
+                            $result = $db->query("INSERT INTO Fornitura(Fornitore) VALUES ('$_POST[piva]');");
                             break;
-                        case "Aggiungi Categoria":
-                            $result = $db->query("INSERT INTO Tipo_Prodotti(nome, caratteristiche) VALUES ('$_POST[nome]', '$_POST[caratteristiche]');");
+                        case "Aggiungi Fornitore":
+                            $result = $db->query("INSERT INTO Fornitore(PIVA, Ragionesociale, CAP, Citta, Via, Civico) 
+                                                        VALUES ('$_POST[piva]', '$_POST[ragione_sociale]', '$_POST[cap]', '$_POST[citta]', '$_POST[via]', '$_POST[civico]');");
+                            break;
+                        case "Cancella Fornitore":
+                            $result = $db->query("DELETE FROM Fornitore WHERE PIVA = '$_POST[piva]' ");
                             break;
                     }
                 }
-                if ($result) {
+                if ($result != null) {
                     echo "<h3>Operazione eseguita correttamente!</h3>";
                 } else {
                     echo "<h3>Errore nella query</h3>";
-                    echo $db->error;
+                    echo "<p>".$db->error;
+                    echo $db->errno."</p>";
                 }
                 $db->close();
             } else {
