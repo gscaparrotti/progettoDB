@@ -251,12 +251,16 @@ input, textarea {
     display: flex;
 }
 
-#show_orders > label {
+.inner_form > label {
     margin: auto;
     text-align: center;
     width: auto;
     justify-content: space-between;
     display: flex;
+}
+
+.inner_select > option {
+    width: 8vw;
 }
 
 #secret_buttons {

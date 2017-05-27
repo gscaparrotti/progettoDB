@@ -47,6 +47,13 @@ include("header_full.html");
                         case "Cancella Fornitore":
                             $result = $db->query("DELETE FROM Fornitore WHERE PIVA = '$_POST[piva]' ");
                             break;
+                        case "Aggiungi Riparazione":
+                            $date = date('Y-m-d H:i:s');
+                            $result = $db->query("INSERT INTO Riparazione (Prodotto, Cliente, `Data Acquisto`, Data, Durata, Riparatore) VALUES ('$_POST[prodotto]', '$_POST[cliente]', '$_POST[data]', '$date','$_POST[ore_lavoro]', '$_POST[riparatore]');");
+                            if ($result) {
+                                $result = $db->query("INSERT INTO Sostituzione (Prodotto, Cliente, `Data Acquisto`, Data, Ricambio, Quantita) VALUES ('$_POST[prodotto]', '$_POST[cliente]', '$_POST[data]', '$date', '$_POST[ricambio]', '1')");
+                            }
+                            break;
                     }
                 }
                 if ($result != null) {

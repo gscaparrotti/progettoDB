@@ -55,6 +55,8 @@ include("header_full.html");
                             <option value="Aggiungi Fornitura">Aggiungi Fornitura</option>
                             <option value="Aggiungi Fornitore">Aggiungi Fornitore</option>
                             <option value="Rimuovi Fornitore">Rimuovi Fornitore</option>
+                            <option value="Nuova Riparazione">Nuova Riparazione</option>
+                            <option value="Mostra Riparazioni">Mostra Riparazioni</option>
                         </select>
                         <input id="submit_secret_buttons" type="submit" value="Invio">
                     </form>
@@ -151,32 +153,6 @@ include("header_full.html");
                                     } ?>
                                 </table>
                                 <?php break;
-                            case ("Aggiorna disponibilità"): ?>
-                                <form class="secret_element" id="disp_update" action='do_query.php' method="post" enctype="multipart/form-data">
-                                    <fieldset class="upload_fieldset" id="disp_fieldset">
-                                        <label>Nuova disponibilità:
-                                            <input id="disp_field" name="disponibile" placeholder="Disponibile" required=""/>
-                                        </label>
-                                        <?php
-                                        if(!$db) {
-                                            echo "connection failed: ".mysqli_connect_error();
-                                        } else {
-                                            $result = $db->query("SELECT id, nome FROM Prodotti");
-                                            if($result && $result->num_rows > 0) {
-                                                echo "<label>Prodotto: ";
-                                                echo "<select name='id' form='disp_update'>";
-                                                while($row = $result->fetch_assoc()) {
-                                                    echo "<option value='$row[id]'>$row[nome]</option>";
-                                                }
-                                                echo "</select>";
-                                                echo "</label>";
-                                            }
-                                        }
-                                        ?>
-                                        <input id="submit_button1" type="submit" value="Aggiorna Disponibilità" name="submit">
-                                    </fieldset>
-                                </form>
-                                <?php break;
                             case ("Aggiungi Prodotto"): ?>
                                 <form class="secret_element" id="upload" action='file_upload.php' method="post" enctype="multipart/form-data">
                                     <fieldset id="upload_fieldset">
@@ -209,7 +185,7 @@ include("header_full.html");
                                         <label class="ampli type">Risposta in Frequenza:
                                             <input name="rif" placeholder="Risposta in Frequenza"/>
                                         </label>
-                                        <label class="ampli type">Risposta in Frequenza:
+                                        <label class="ampli type">Numero Ingressi:
                                             <input name="ningressi" type="number" placeholder="Numero Ingressi"/>
                                         </label>
                                         <label class="diff type">Potenza Massima:
@@ -324,7 +300,7 @@ include("header_full.html");
                                                 echo "<td>".$row[$i]."</td>";
                                             };?>
                                             <td>
-                                                <form id="show_orders" action='do_query.php' method="post" enctype="multipart/form-data">
+                                                <form id="show_orders" class="inner_form" action='do_query.php' method="post" enctype="multipart/form-data">
                                                     <label>
                                                         Condizione:
                                                         <input type="text" name="condizione" <?php echo $quantita == 0 ? 'disabled' : ''; ?>>
@@ -428,6 +404,94 @@ include("header_full.html");
                                         <input id="submit_button2" type="submit" value="Cancella Fornitore" name="submit">
                                     </fieldset>
                                 </form>
+                                <?php break;
+                            case ("Nuova Riparazione"): ?>
+                                <table class="secret_element" id="tabella_clenti" style="">
+                                    <?php
+                                    $result = $db->query("SELECT Cliente, Data, Produttore, Nome, DurataGaranzia, Acquisto.Prodotto FROM Acquisto INNER JOIN ProdottoInNegozio ON Acquisto.Prodotto = ProdottoInNegozio.ID INNER JOIN Prodotto ON ProdottoInNegozio.Prodotto = Prodotto.Codice WHERE DATEDIFF(DATE_ADD(Data, INTERVAL DurataGaranzia YEAR), NOW()) >= 0");
+                                    $riparatori = $db->query("SELECT * FROM Riparatore");
+                                    $ricambi = $db->query("SELECT * FROM Ricambio");
+                                    if ($result) {
+                                        $fields = $result->fetch_fields();
+                                        $assoc = $result->fetch_all(MYSQLI_ASSOC);
+                                        $result->data_seek(0);
+                                    }
+                                    else {
+                                        echo $db->error;
+                                    }?>
+                                    <tr>
+                                        <?php for ($i=0; $i<sizeof($fields) - 1; $i++) {
+                                            echo "<th>".$fields[$i]->name."</th>";
+                                        } ?>
+                                    </tr>
+                                    <?php
+                                    $current_row = 0;
+                                    while($row = $result->fetch_row()) {
+                                        echo "<tr>";
+                                        for ($i=0; $i<sizeof($row) - 1; $i++) {
+                                            echo "<td>".$row[$i]."</td>";
+                                        } ?>
+                                        <td>
+                                            <form id="add_riparazione" class="inner_form" action='do_query.php' method="post" enctype="multipart/form-data">
+                                                <label>Riparatore:
+                                                    <select id="riparatore_select" class="inner_select" name='riparatore' form='add_riparazione'>
+                                                        <?php
+                                                        $riparatori->data_seek(0);
+                                                        while ($fields = $riparatori->fetch_assoc()) {
+                                                            $matricola = $fields['Matricola'];
+                                                            $nome = $fields['Nome'].' '.$fields['Cognome']; ?>
+                                                            <option value=<?php echo $matricola?>><?php echo $nome?></option>
+                                                        <?php }
+                                                        ?>
+                                                    </select>
+                                                </label>
+                                                <label>Ricambio:
+                                                    <select id="ricambio_select" class="inner_select"  name='ricambio' form='add_riparazione'>
+                                                        <?php
+                                                        $ricambi->data_seek(0);
+                                                        while ($fields = $ricambi->fetch_assoc()) {
+                                                            $nome = $fields['Nome'];?>
+                                                            <option value="<?php echo $nome?>"><?php echo $nome?></option>
+                                                        <?php }
+                                                        ?>
+                                                    </select>
+                                                </label>
+                                                <label>Ore di lavoro:
+                                                    <input name="ore_lavoro" type="number" required=""/>
+                                                </label>
+                                                <input type="hidden" name="prodotto" value=<?php echo $assoc[$current_row]['Prodotto']; ?>>
+                                                <input type="hidden" name="data" value="<?php echo $assoc[$current_row]['Data']; ?>">
+                                                <input type="hidden" name="cliente" value=<?php echo $assoc[$current_row]['Cliente']; ?>>
+                                                <input id="submit_button2" type="submit" value="Aggiungi Riparazione" name="submit">
+                                            </form>
+                                        </td>
+                                        <?php echo "</tr>";
+                                    $current_row++;
+                                    } ?>
+                                </table>
+                                <?php break;
+                            case ("Mostra Riparazioni"): ?>
+                                <table class="secret_element" style="">
+                                    <?php $result = $db->query("SELECT Prodotto.Produttore, Prodotto.Nome, Cliente, Riparazione.`Data Acquisto`, Riparazione.Data as 'Data Riparazione', Durata, Riparatore.Nome as 'Nome Riparatore', Riparatore.Cognome as 'Cognome Riparatore' FROM Riparazione INNER JOIN ProdottoInNegozio on Riparazione.Prodotto = ProdottoInNegozio.ID INNER JOIN Prodotto ON ProdottoInNegozio.Prodotto = Prodotto.Codice INNER JOIN Riparatore ON Riparazione.Riparatore = Riparatore.Matricola ");
+                                    if ($result) {
+                                        $fields = $result->fetch_fields();
+                                    }
+                                    else {
+                                        echo $db->error;
+                                    }?>
+                                    <tr>
+                                        <?php for ($i=0; $i<sizeof($fields); $i++) {
+                                            echo "<th>".$fields[$i]->name."</th>";
+                                        } ?>
+                                    </tr>
+                                    <?php while($row = $result->fetch_row()) {
+                                        echo "<tr>";
+                                        for ($i=0; $i<sizeof($row); $i++) {
+                                            echo "<td>".$row[$i]."</td>";
+                                        }
+                                        echo "</tr>";
+                                    } ?>
+                                </table>
                                 <?php break;
                         }
                     }
