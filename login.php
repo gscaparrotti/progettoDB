@@ -57,6 +57,8 @@ include("header_full.html");
                             <option value="Rimuovi Fornitore">Rimuovi Fornitore</option>
                             <option value="Nuova Riparazione">Nuova Riparazione</option>
                             <option value="Mostra Riparazioni">Mostra Riparazioni</option>
+                            <option value="Aggiungi Riparatore / Mostra Riparatori">Aggiungi Riparatore / Mostra Riparatori</option>
+                            <option value="Aggiungi Ricambio / Mostra Ricambi">Aggiungi Ricambio / Mostra Ricambi</option>
                         </select>
                         <input id="submit_secret_buttons" type="submit" value="Invio">
                     </form>
@@ -351,10 +353,14 @@ include("header_full.html");
                                             }
                                         }
                                         ?>
+                                        <label>Data Fornitura:
+                                            <select name="data_fornitura" form="add_fornitura_form">
+                                                <option>Data attuale</option>
+                                            </select>
+                                        </label>
                                         <input id="submit_button2" type="submit" value="Aggiungi Fornitura" name="submit">
                                     </fieldset>
                                 </form>
-                                <p>La fornitura verrà aggiunta con la data e l'ora attuali</p>
                                 <?php break;
                             case ("Aggiungi Fornitore"): ?>
                                 <form class="secret_element" id="aggiungi_fornitore" action='do_query.php' method="post" enctype="multipart/form-data">
@@ -472,7 +478,7 @@ include("header_full.html");
                                 <?php break;
                             case ("Mostra Riparazioni"): ?>
                                 <table class="secret_element" style="">
-                                    <?php $result = $db->query("SELECT Prodotto.Produttore, Prodotto.Nome, Cliente, Riparazione.`Data Acquisto`, Riparazione.Data as 'Data Riparazione', Durata, Riparatore.Nome as 'Nome Riparatore', Riparatore.Cognome as 'Cognome Riparatore' FROM Riparazione INNER JOIN ProdottoInNegozio on Riparazione.Prodotto = ProdottoInNegozio.ID INNER JOIN Prodotto ON ProdottoInNegozio.Prodotto = Prodotto.Codice INNER JOIN Riparatore ON Riparazione.Riparatore = Riparatore.Matricola ");
+                                    <?php $result = $db->query("SELECT Prodotto.Produttore, Prodotto.Nome, Riparazione.Cliente, Riparazione.`Data Acquisto`, Riparazione.Data as 'Data Riparazione', Riparatore.Nome as 'Nome Riparatore', Riparatore.Cognome as 'Cognome Riparatore', Riparatore.PagaOraria, Riparazione.Durata, Ricambio.Costo, Sostituzione.Quantita FROM Riparazione LEFT OUTER JOIN Sostituzione ON Riparazione.Prodotto = Sostituzione.Prodotto AND Riparazione.Cliente = Sostituzione.Cliente AND Riparazione.`Data Acquisto` = Sostituzione.`Data Acquisto` AND Riparazione.Data = Sostituzione.Data LEFT OUTER JOIN Ricambio ON Sostituzione.Ricambio = Ricambio.Nome INNER JOIN ProdottoInNegozio on Riparazione.Prodotto = ProdottoInNegozio.ID INNER JOIN Prodotto ON ProdottoInNegozio.Prodotto = Prodotto.Codice INNER JOIN Riparatore ON Riparazione.Riparatore = Riparatore.Matricola ORDER BY Riparazione.Data DESC");
                                     if ($result) {
                                         $fields = $result->fetch_fields();
                                     }
@@ -480,14 +486,98 @@ include("header_full.html");
                                         echo $db->error;
                                     }?>
                                     <tr>
-                                        <?php for ($i=0; $i<sizeof($fields); $i++) {
+                                        <?php for ($i=0; $i<sizeof($fields) - 6; $i++) {
                                             echo "<th>".$fields[$i]->name."</th>";
                                         } ?>
+                                        <th>Riparatore</th>
+                                        <th>Costo Riparazione</th>
                                     </tr>
                                     <?php while($row = $result->fetch_row()) {
                                         echo "<tr>";
-                                        for ($i=0; $i<sizeof($row); $i++) {
+                                        for ($i=0; $i<sizeof($row) - 6; $i++) {
                                             echo "<td>".$row[$i]."</td>";
+                                        }
+                                        echo "<td>".$row[$i].' '.$row[$i + 1]."</td>";
+                                        echo "<td>".($row[$i + 2]*$row[$i + 3] + $row[$i + 4]*$row[$i + 5])."</td>";
+                                        echo "</tr>";
+                                    } ?>
+                                </table>
+                                <?php break;
+                            case ("Aggiungi Riparatore / Mostra Riparatori"): ?>
+                                <form class="secret_element" id="aggiungi_riparatore" action='do_query.php'
+                                      method="post" enctype="multipart/form-data">
+                                    <fieldset id="upload_fieldset">
+                                        <label>Matricola:
+                                            <input name="matricola" type="number" required=""/>
+                                        </label>
+                                        <label>Nome:
+                                            <input name="nome" placeholder="Nome" required=""/>
+                                        </label>
+                                        <label>Cognome:
+                                            <input name="cognome" placeholder="Cognome" required=""/>
+                                        </label>
+                                        <label>Paga Oraria:
+                                            <input name="paga" type="number" required=""/>
+                                        </label>
+                                        <input id="submit_button" type="submit" value="Aggiungi Riparatore"
+                                               name="submit">
+                                    </fieldset>
+                                </form>
+                                <hr>
+                                <h2 style="margin-top: 2vh">Lista Riparatori</h2>
+                                <table class="secret_element" style="">
+                                    <?php $result = $db->query("SELECT * FROM Riparatore ORDER BY Matricola");
+                                    if ($result) {
+                                        $fields = $result->fetch_fields();
+                                    } else {
+                                        echo $db->error;
+                                    } ?>
+                                    <tr>
+                                        <?php for ($i = 0; $i < sizeof($fields); $i++) {
+                                            echo "<th>" . $fields[$i]->name . "</th>";
+                                        } ?>
+                                    </tr>
+                                    <?php while ($row = $result->fetch_row()) {
+                                        echo "<tr>";
+                                        for ($i = 0; $i < sizeof($row); $i++) {
+                                            echo "<td>" . $row[$i] . "</td>";
+                                        }
+                                        echo "</tr>";
+                                    } ?>
+                                </table>
+                                <?php break;
+                            case ("Aggiungi Ricambio / Mostra Ricambi"): ?>
+                                <form class="secret_element" id="aggiungi_ricambio" action='do_query.php'
+                                      method="post" enctype="multipart/form-data">
+                                    <fieldset id="upload_fieldset">
+                                        <label>Nome:
+                                            <input name="nome" placeholder="Nome" required=""/>
+                                        </label>
+                                        <label>Costo:
+                                            <input name="costo" type="number" required=""/>
+                                        </label>
+                                        <input id="submit_button" type="submit" value="Aggiungi Ricambio"
+                                               name="submit">
+                                    </fieldset>
+                                </form>
+                                <hr>
+                                <h2 style="margin-top: 2vh">Lista Ricambi</h2>
+                                <table class="secret_element" style="">
+                                    <?php $result = $db->query("SELECT * FROM Ricambio ORDER BY Nome");
+                                    if ($result) {
+                                        $fields = $result->fetch_fields();
+                                    } else {
+                                        echo $db->error;
+                                    } ?>
+                                    <tr>
+                                        <?php for ($i = 0; $i < sizeof($fields); $i++) {
+                                            echo "<th>" . $fields[$i]->name . "</th>";
+                                        } ?>
+                                    </tr>
+                                    <?php while ($row = $result->fetch_row()) {
+                                        echo "<tr>";
+                                        for ($i = 0; $i < sizeof($row); $i++) {
+                                            echo "<td>" . $row[$i] . "</td>";
                                         }
                                         echo "</tr>";
                                     } ?>

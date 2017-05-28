@@ -54,6 +54,12 @@ include("header_full.html");
                                 $result = $db->query("INSERT INTO Sostituzione (Prodotto, Cliente, `Data Acquisto`, Data, Ricambio, Quantita) VALUES ('$_POST[prodotto]', '$_POST[cliente]', '$_POST[data]', '$date', '$_POST[ricambio]', '1')");
                             }
                             break;
+                        case "Aggiungi Riparatore":
+                            $result = $db->query("INSERT INTO Riparatore(Matricola, Nome, Cognome, PagaOraria) VALUES ('$_POST[matricola]', '$_POST[nome]', '$_POST[cognome]', '$_POST[paga]')");
+                            break;
+                        case "Aggiungi Ricambio":
+                            $result = $db->query("INSERT INTO Ricambio(Nome, Costo) VALUES ('$_POST[nome]', '$_POST[costo]')");
+                            break;
                     }
                 }
                 if ($result != null) {
