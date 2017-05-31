@@ -209,6 +209,7 @@ input, textarea {
 }
 
 .dati_carrello label input {
+    width: 40vw;
     margin-left: 1vw;
 }
 

@@ -80,9 +80,11 @@
                                         echo " pezzi disponibili";
                                     }?></p>
                             </div>
-                            <button type="button" onclick="addToCart(<?php echo $row['Codice'] ?>,'<?php echo $row['Nome'] ?>','<?php echo $row['Sconto'] ?>','<?php echo $row['Condizione'] ?>')">Acquista</button>
+                            <button type="button" onclick="addToCart(<?php echo $row['Codice'] ?>,'<?php echo $row["Produttore"]." ".$row['Nome'] ?>','<?php echo $row['Sconto'] ?>','<?php echo $row['Condizione'] ?>')">Acquista</button>
                         </div>
-                        <?php }
+                        <?php } else {
+                                echo "<h4>Prodotto Esaurito</h4>";
+                            }
                             } ?>
                     </div>
                     <?php

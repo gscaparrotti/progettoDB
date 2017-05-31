@@ -11,7 +11,6 @@
       } else {
         $result = $db->query("SELECT ID, Produttore, Nome, img, Costo, Sconto, Disp, Descrizione
                                     FROM (SELECT ProdottoInNegozio.Prodotto as ID, ProdottoInNegozio.Sconto as Sconto, Count(*) as Disp FROM ProdottoInNegozio 
-                                    INNER JOIN Fornitura ON ProdottoInNegozio.DataFornitura = Fornitura.Data AND ProdottoInNegozio.Fornitore = Fornitura.Fornitore
                                     WHERE Venduto = 0
                                     GROUP BY ProdottoInNegozio.Prodotto
                                     ORDER BY DataFornitura DESC
@@ -36,8 +35,7 @@
                               echo " pezzi disponibili";
                             }?></p>
                 </div>
-                <button type="button" onclick="addToCart(<?php echo $row["ID"] ?>,'<?php echo $row["Produttore"]." ".$row["Nome"] ?>')">Acquista</button>
-                <button id="<?php echo $row[""]?>" class="detail_button" type="button">Informazioni</button>
+                <button id="<?php echo $row["ID"]?>" class="detail_button" type="button">Informazioni</button>
               </div>
             <?php
             }
@@ -67,6 +65,7 @@
         $result = $db->query("SELECT Prodotto, Produttore, Nome, img, Costo, Sconto, Vendite, Descrizione, Disp
                                     FROM (SELECT Prodotto, Sconto, Count(NULLIF(0, ProdottoInNegozio.Venduto)) as Vendite, Count(NULLIF(1, ProdottoInNegozio.Venduto)) as Disp FROM ProdottoInNegozio 
                                     GROUP BY ProdottoInNegozio.Prodotto
+                                    HAVING Disp > 0
                                     ORDER BY Vendite DESC
                                     LIMIT 3)ProdottiPiuVenduti
                                     INNER JOIN Prodotto on ProdottiPiuVenduti.Prodotto = Prodotto.Codice");

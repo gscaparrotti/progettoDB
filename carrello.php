@@ -50,6 +50,7 @@ function is_session_started()
                     <table id="carrello_page_table" class="carrello_table carrello_table_page">
                         <tr>
                             <th>Prodotto</th>
+                            <th>Condizione</th>
                             <th>Quantità</th>
                         </tr>
                         <?php
@@ -61,7 +62,12 @@ function is_session_started()
                             }
                             foreach ($_SESSION['prod'] as $prod) {
                                 echo "<tr><td>";
-                                echo $prod['nome'];
+                                echo $prod["nome"];
+                                echo "</td><td>";
+                                echo $prod["cond"];
+                                if ($prod['sconto'] != 0) {
+                                    echo ", -".$prod["sconto"]."%";
+                                }
                                 echo "</td><td>";
                                 echo $prod['quantita'];
                                 echo "</td></tr>";
@@ -93,25 +99,29 @@ function is_session_started()
                         case 1: ?>
                             <section id="carrello_page_inner">
                                 <h4>Inserisci i tuoi dati personali</h4>
+                                <p>Se è già stato effettuato un acquisto è possibile inserire solo l'indirizzo E-Mail; sarà comunque possibile ricontrollare i dati precedentemente inseriti.</p>
                                 <form action='carrello.php?step=2' method="post">
                                     <fieldset class="dati_carrello">
                                         <label>Nome:
-                                            <input id="carrello_nome" type="text" name="nome" placeholder="Nome" required>
+                                            <input id="carrello_nome" type="text" name="Nome" placeholder="Nome">
                                         </label>
                                         <label>Cognome:
-                                            <input id="carrello_cognome" type="text" name="cognome" placeholder="Cognome" required>
+                                            <input id="carrello_cognome" type="text" name="Cognome" placeholder="Cognome">
+                                        </label>
+                                        <label>CAP:
+                                            <input id="carrello_cap" type="number" name="CAP" placeholder="CAP">
                                         </label>
                                         <label>Città:
-                                            <input id="carrello_citta" type="text" name="citta" placeholder="Città" required>
+                                            <input id="carrello_citta" type="text" name="Citta" placeholder="Città">
                                         </label>
                                         <label>Indirizzo:
-                                            <input id="carrello_indirizzo" type="text" name="indirizzo" placeholder="Indirizzo" required>
+                                            <input id="carrello_indirizzo" type="text" name="Via" placeholder="Indirizzo">
                                         </label>
-                                        <label>Telefono:
-                                            <input id="carrello_telefono" type="number" name="telefono" placeholder="Telefono" required>
+                                        <label>Indirizzo:
+                                            <input id="carrello_civico" type="text" name="Civico" placeholder="Civico">
                                         </label>
                                         <label>E-Mail:
-                                            <input id="carrello_email" type="email" name="email" placeholder="E-Mail" required>
+                                            <input id="carrello_email" type="E-Mail" name="E-Mail" placeholder="E-Mail" required>
                                         </label>
                                         <input class="svuota svuota2 avanti" type="submit" value="Avanti">
                                     </fieldset>
@@ -119,36 +129,96 @@ function is_session_started()
                             </section>
                             <?php break;
                         case 2:
+                            $insert = true;
                             $_SESSION['dati'] = array();
-                            $_SESSION['dati'] = $_POST; ?>
+                            $db = mysqli_connect("localhost", "writer", "", "progetto");
+                            if (!$db) {
+                                echo "connection failed: " . mysqli_connect_error();
+                            } else {
+                                $email = $_POST['E-Mail'];
+                                $result = $db->query("SELECT * FROM Cliente WHERE `E-Mail` = '$email' LIMIT 1");
+                            }
+                            if ($result->num_rows > 0) {
+                                $_SESSION['dati'] = $result->fetch_assoc();
+                                $insert = false;
+                            } else {
+                                $_SESSION['dati'] = $_POST;
+                            }
+                            $_SESSION['insert'] = $insert; ?>
                             <h4>Riepilogo</h4>
                             <h5>Prodotti nel Carrello</h5>
                             <table id="carrello_page_table" class="carrello_table carrello_table_page">
+                                <tr>
+                                    <th>Prodotto</th>
+                                    <th>Condizione</th>
+                                    <th>Quantità</th>
+                                </tr>
+                                <?php foreach ($_SESSION['prod'] as $prod) {
+                                echo "<tr><td>";
+                                        echo $prod["nome"];
+                                        echo "</td><td>";
+                                        echo $prod["cond"];
+                                        if ($prod['sconto'] != 0) {
+                                        echo ", -".$prod["sconto"]."%";
+                                        }
+                                        echo "</td><td>";
+                                        echo $prod['quantita'];
+                                        echo "</td></tr>";
+                                } ?>
                             </table>
                             <h5>Dati Inseriti</h5>
-                            <p>Nome: <?php echo $_POST['nome'] ?></p>
-                            <p>Cognome: <?php echo $_POST['cognome'] ?></p>
-                            <p>Città: <?php echo $_POST['citta'] ?></p>
-                            <p>Indirizzo: <?php echo $_POST['indirizzo'] ?></p>
-                            <p>Telefono: <?php echo $_POST['telefono'] ?></p>
-                            <p>E-Mail: <?php echo $_POST['email'] ?></p>
+                            <p>Nome: <?php echo $_SESSION['dati']['Nome'] ?></p>
+                            <p>Cognome: <?php echo $_SESSION['dati']['Cognome'] ?></p>
+                            <p>Città: <?php echo $_SESSION['dati']['Citta'] ?></p>
+                            <p>Indirizzo: <?php echo $_SESSION['dati']['Via'].' '.$_SESSION['dati']['Civico'] ?></p>
+                            <p>E-Mail: <?php echo $_POST['E-Mail'] ?></p>
                             <form action='carrello.php?step=3' method="post">
                                 <input class="svuota svuota2 avanti" type="submit" value="Avanti">
                             </form>
                             <?php break;
                         case 3: ?>
                             <section id="carrello_page_inner">
-                                <h4>Inserisci i dati della tua carta di credito</h4>
-                                <form action='carrello.php?step=4' method="post">
+                                <h4>Seleziona un metodo di pagamento</h4>
+                                <form id="pay" action='carrello.php?step=4' method="post">
+                                <?php
+                                $db = mysqli_connect("localhost", "writer", "", "progetto");
+                                if (!$db) {
+                                    echo "connection failed: " . mysqli_connect_error();
+                                } else {
+                                    if (!$_SESSION['insert']) {
+                                        $email = $_SESSION['dati']['E-Mail'];
+                                        $result = $db->query("SELECT * FROM MetodoPagamento WHERE Cliente = '$email'");
+                                        if ($result->num_rows > 0) {
+                                            echo "<fieldset><label>Metodi di pagamento usati in precedenza: ";
+                                            echo "<select name='old_method' form='pay'>";
+                                            echo "<option value=-1 selected=''>(Nuovo Metodo di Pagamento)</option>";
+                                            while ($record = $result->fetch_assoc()) {
+                                                if ($record['Tipo'] == 1) {
+                                                    echo "<option value=$record[ID]>Carta di Credito ($record[Codice])</option>";
+                                                } else if ($record['Tipo'] == 0) {
+                                                    echo "<option value=$record[ID]>Altro</option>";
+                                                }
+                                            }
+                                            echo "</select></label></fieldset>";
+                                        }
+                                    }
+                                }
+                                ?>
                                     <fieldset class="dati_carrello">
+                                        <label>Tipo nuovo metodo di pagamento:
+                                            <select name="new_method" form="pay">
+                                                <option value="1">Carta di Credito</option>
+                                                <option value="0">Altro</option>
+                                            </select>
+                                        </label>
                                         <label>Codice carta di credito:
-                                            <input id="carrello_numero_carta" name="codice" placeholder="Numero Carta">
+                                            <input id="carrello_numero_carta" name="Codice" placeholder="Numero Carta">
                                         </label>
                                         <label>Data di scadenza (MM-AA):
-                                            <input id="carrello_scadenza_carta" name="scadenza">
+                                            <input id="carrello_scadenza_carta" name="Scadenza" placeholder="Data di scadenza">
                                         </label>
                                         <label>Codice di sicurezza a 3 cifre:
-                                            <input id="carrello_codice_sicurezza" placeholder="Codice di Sicurezza" name="codiceSicurezza">
+                                            <input id="carrello_codice_sicurezza" placeholder="Codice di Sicurezza" name="CodSicurezza">
                                         </label>
                                         <input class="svuota svuota2 avanti" type="submit" value="Avanti">
                                     </fieldset>
@@ -163,14 +233,14 @@ function is_session_started()
                                 $ok = true;
                                 $prods = $_SESSION['prod'];
                                 $result1 = $db->query("REPLACE INTO Cliente
-                                              VALUES ('" . $_SESSION['dati']['nome'] . "','" . $_SESSION['dati']['cognome'] . "','" . $_SESSION['dati']['citta'] . "','" . $_SESSION['dati']['indirizzo'] . "','"
-                                    . $_SESSION['dati']['telefono'] . "','" . $_SESSION['dati']['email'] . "','" . $_POST['codice'] . "','" . $_POST['scadenza'] . "','" . $_POST['codiceSicurezza'] . "');");
+                                              VALUES ('" . $_SESSION['dati']['E-Mail'] . "','" . 'NULL' . "','" . $_SESSION['dati']['Nome'] . "','" . $_SESSION['dati']['Cognome'] . "','" . $_SESSION['dati']['CAP'] . "','"
+                                    . $_SESSION['dati']['Via'] . "','" . $_SESSION['dati']['Citta'] . "','" . $_SESSION['dati']['Civico'] . "');");
 
                                 if ($result1) {
                                     for ($i = 0; $i < sizeof($prods); $i++) {
                                         $quantita = $prods[$i]['quantita'];
                                         $id = $prods[$i]['id'];
-                                        $result = $db->query("INSERT INTO Acquisto(email, prodotto, quantita) VALUES ('" . $_SESSION['dati']['email'] . "','" . $id . "','" . $quantita . "');");
+                                        $result = $db->query("INSERT INTO Acquisto(email, prodotto, quantita) VALUES ('" . $_SESSION['dati']['E-Mail'] . "','" . $id . "','" . $quantita . "');");
                                         if ($result) {
                                             $result2 = $db->query("UPDATE Vendite SET venduti = venduti + $quantita, disponibile = disponibile - $quantita WHERE id_prodotto = $id");
                                             if (!$result2) {
