@@ -44,8 +44,8 @@ include("header_full.html");
                         Selezionare l'azione da eseguire:
                         <select name="show" form="secret_buttons">
                             <option value="Mostra Ordini">Mostra Ordini</option>
+                            <option value="Mostra Clienti e Metodi di Pagamento">Mostra Clienti e Metodi di Pagamento</option>
                             <option value="Mostra Commenti">Mostra Commenti</option>
-                            <option value="Mostra Clienti">Mostra Clienti e Metodi di Pagamento</option>
                             <option value="Aggiungi Prodotto">Aggiungi Prodotto</option>
                             <option value="Rimuovi Prodotto">Rimuovi Prodotto</option>
                             <option value="Aggiungi Ordinazione Prodotto">Aggiungi Ordinazione Prodotto</option>
@@ -132,7 +132,7 @@ include("header_full.html");
                                     } ?>
                                 </table>
                                 <?php break;
-                            case ("Mostra Clienti"): ?>
+                            case ("Mostra Clienti e Metodi di Pagamento"): ?>
                                 <table class="secret_element" id="tabella_clenti" style="">
                                     <?php $result = $db->query("SELECT `E-Mail`, Nome, Cognome, CAP, Citta, Via, Civico, Tipo as 'Metodo Pagamento', ID, Codice, Scadenza, CodSicurezza From Cliente INNER JOIN MetodoPagamento");
                                     if ($result) {
