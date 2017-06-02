@@ -121,7 +121,7 @@ function is_session_started()
                                             <input id="carrello_civico" type="text" name="Civico" placeholder="Civico">
                                         </label>
                                         <label>E-Mail:
-                                            <input id="carrello_email" type="E-Mail" name="E-Mail" placeholder="E-Mail" required>
+                                            <input id="carrello_email" type="email" name="E-Mail" placeholder="E-Mail" required>
                                         </label>
                                         <input class="svuota svuota2 avanti" type="submit" value="Avanti">
                                     </fieldset>
@@ -138,7 +138,7 @@ function is_session_started()
                                 $email = $_POST['E-Mail'];
                                 $result = $db->query("SELECT * FROM Cliente WHERE `E-Mail` = '$email' LIMIT 1");
                             }
-                            if ($result->num_rows > 0) {
+                            if (isset($result) && $result->num_rows > 0) {
                                 $_SESSION['dati'] = $result->fetch_assoc();
                                 $insert = false;
                             } else {
@@ -230,34 +230,54 @@ function is_session_started()
                             if (!$db) {
                                 echo "connection failed: " . mysqli_connect_error();
                             } else {
-                                $ok = true;
+                                $ok = false;
                                 $prods = $_SESSION['prod'];
-                                $result1 = $db->query("REPLACE INTO Cliente
+                                if ($_SESSION['insert']) {
+                                    $result1 = $db->query("INSERT INTO Cliente
                                               VALUES ('" . $_SESSION['dati']['E-Mail'] . "','" . 'NULL' . "','" . $_SESSION['dati']['Nome'] . "','" . $_SESSION['dati']['Cognome'] . "','" . $_SESSION['dati']['CAP'] . "','"
-                                    . $_SESSION['dati']['Via'] . "','" . $_SESSION['dati']['Citta'] . "','" . $_SESSION['dati']['Civico'] . "');");
-
+                                        . $_SESSION['dati']['Via'] . "','" . $_SESSION['dati']['Citta'] . "','" . $_SESSION['dati']['Civico'] . "');");
+                                } else {
+                                    $result1 = true;
+                                }
                                 if ($result1) {
+                                    $email = $_SESSION['dati']['E-Mail'];
+                                    if ((isset($_POST['old_method']) && $_POST['old_method'] == -1) || !isset($_POST['old_method']) ) {
+                                        if ($_POST['new_method'] == 0) {
+                                            $result2 = "INSERT INTO MetodoPagamento(Cliente, Intestatario, Tipo) VALUES ($email, $email, 0)";
+                                        } else if ($_POST['new_method'] == 1) {
+                                            $result2 = "INSERT INTO MetodoPagamento(Cliente, Intestatario, Tipo, Codice, Scadenza, CodSicurezza) VALUES ($email, $email, 1, $_POST[Codice], $_POST[Scadenza], $_POST[CodSicurezza])";
+                                        }
+                                        if (isset($result2) && $result2) {
+                                            $pay_id = $db->query("SELECT MAX(ID) as pay_id FROM MetodoPagamento WHERE Cliente = $email")->fetch_assoc()['pay_id'];
+                                        }
+                                    } else {
+                                        $pay_id = $_POST['old_method'];
+                                    }
+                                }
+                                if (isset($pay_id)) {
                                     for ($i = 0; $i < sizeof($prods); $i++) {
                                         $quantita = $prods[$i]['quantita'];
-                                        $id = $prods[$i]['id'];
-                                        $result = $db->query("INSERT INTO Acquisto(email, prodotto, quantita) VALUES ('" . $_SESSION['dati']['E-Mail'] . "','" . $id . "','" . $quantita . "');");
-                                        if ($result) {
-                                            $result2 = $db->query("UPDATE Vendite SET venduti = venduti + $quantita, disponibile = disponibile - $quantita WHERE id_prodotto = $id");
-                                            if (!$result2) {
-                                                echo " Errore nella Query SQL: ";
-                                                printf("Errormessage: %s\n", $db->error);
-                                                $ok = false;
+                                        for ($a = 0; $a < $quantita; $a++) {
+                                            $id = $prods[$i]['id'];
+                                            $cond = $prods[$i]['cond'];
+                                            $sconto = $prods[$i]['sconto'];
+                                            try {
+                                                $purchased = $db->query("SELECT ID FROM ProdottoInNegozio WHERE Prodotto = '$id' AND Condizione = '$cond' AND Sconto = '$sconto' LIMIT 1");
+                                                $real_id = $purchased->fetch_assoc()['ID'];
+                                                $result3 = $db->query("UPDATE ProdottoInNegozio SET Venduto = 1 WHERE ID = $real_id");
+                                                $result4 = $db->query("INSERT INTO Acquisto(Prodotto, Cliente, Pagamento, Stato) VALUES('$real_id', '$email', '$pay_id', 'Nuovo')");
+                                            } catch (Exception $e) {
+                                                echo "<p>Errore nell'aggiunta dell'ordine: ".$db->error."</p>";
                                                 break;
                                             }
-                                        } else {
-                                            echo " Errore nella Query SQL: ";
-                                            printf("Errormessage: %s\n", $db->error);
-                                            $ok = false;
+                                        }
+                                        if ($a != $quantita) {
                                             break;
                                         }
                                     }
-                                } else {
-                                    $ok = false;
+                                    if ($i == sizeof($prods)) {
+                                        $ok = true;
+                                    }
                                 }
                                 if ($ok) {
                                     session_unset();
@@ -267,8 +287,6 @@ function is_session_started()
                                         setcookie('ordini', null, -1, '/');
                                     }
                                     echo "<p>Ordine eseguito correttamente!</p>";
-                                } else {
-                                    echo $db->error;
                                 }
                                 $db->close();
                             }

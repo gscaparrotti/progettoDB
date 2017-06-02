@@ -45,7 +45,7 @@ include("header_full.html");
                         <select name="show" form="secret_buttons">
                             <option value="Mostra Ordini">Mostra Ordini</option>
                             <option value="Mostra Commenti">Mostra Commenti</option>
-                            <option value="Mostra Clienti">Mostra Clienti</option>
+                            <option value="Mostra Clienti">Mostra Clienti e Metodi di Pagamento</option>
                             <option value="Aggiungi Prodotto">Aggiungi Prodotto</option>
                             <option value="Rimuovi Prodotto">Rimuovi Prodotto</option>
                             <option value="Aggiungi Ordinazione Prodotto">Aggiungi Ordinazione Prodotto</option>
@@ -134,7 +134,7 @@ include("header_full.html");
                                 <?php break;
                             case ("Mostra Clienti"): ?>
                                 <table class="secret_element" id="tabella_clenti" style="">
-                                    <?php $result = $db->query("SELECT `E-Mail`, Nome, Cognome, CAP, Citta, Via, Civico, Tipo as 'Metodo Pagamento', Codice, Scadenza, CodSicurezza From Cliente INNER JOIN MetodoPagamento");
+                                    <?php $result = $db->query("SELECT `E-Mail`, Nome, Cognome, CAP, Citta, Via, Civico, Tipo as 'Metodo Pagamento', ID, Codice, Scadenza, CodSicurezza From Cliente INNER JOIN MetodoPagamento");
                                     if ($result) {
                                         $fields = $result->fetch_fields();
                                     }
@@ -149,7 +149,19 @@ include("header_full.html");
                                     <?php while($row = $result->fetch_row()) {
                                         echo "<tr>";
                                         for ($i=0; $i<sizeof($row); $i++) {
-                                            echo "<td>".$row[$i]."</td>";
+                                            if ($i != 7) {
+                                                if ($row[$i] != null) {
+                                                    echo "<td>".$row[$i]."</td>";
+                                                } else {
+                                                    echo '<td>-</td>';
+                                                }
+                                            } else {
+                                                if ($row[$i] == 0) {
+                                                    echo '<td>Altro</td>';
+                                                } else if ($row[$i] == 1) {
+                                                    echo '<td>Carta di Credito</td>';
+                                                }
+                                            }
                                         }
                                         echo "</tr>";
                                     } ?>
