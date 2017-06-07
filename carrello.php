@@ -243,12 +243,14 @@ function is_session_started()
                                     $email = $_SESSION['dati']['E-Mail'];
                                     if ((isset($_POST['old_method']) && $_POST['old_method'] == -1) || !isset($_POST['old_method']) ) {
                                         if ($_POST['new_method'] == 0) {
-                                            $result2 = "INSERT INTO MetodoPagamento(Cliente, Intestatario, Tipo) VALUES ($email, $email, 0)";
+                                            $result2 = $db->query("INSERT INTO MetodoPagamento(Cliente, Intestatario, Tipo) VALUES ('$email', '$email', 0)");
                                         } else if ($_POST['new_method'] == 1) {
-                                            $result2 = "INSERT INTO MetodoPagamento(Cliente, Intestatario, Tipo, Codice, Scadenza, CodSicurezza) VALUES ($email, $email, 1, $_POST[Codice], $_POST[Scadenza], $_POST[CodSicurezza])";
+                                            $result2 = $db->query("INSERT INTO MetodoPagamento(Cliente, Intestatario, Tipo, Codice, Scadenza, CodSicurezza) VALUES ('$email', '$email', 1, '$_POST[Codice]', '$_POST[Scadenza]', '$_POST[CodSicurezza]')");
                                         }
+                                        echo $db->info;
                                         if (isset($result2) && $result2) {
-                                            $pay_id = $db->query("SELECT MAX(ID) as pay_id FROM MetodoPagamento WHERE Cliente = $email")->fetch_assoc()['pay_id'];
+                                            $pay_id = $db->query("SELECT MAX(ID) AS pay_id FROM MetodoPagamento WHERE Cliente = '$email'")->fetch_assoc()['pay_id'];
+                                            var_dump($pay_id);
                                         }
                                     } else {
                                         $pay_id = $_POST['old_method'];
@@ -278,6 +280,9 @@ function is_session_started()
                                     if ($i == sizeof($prods)) {
                                         $ok = true;
                                     }
+                                } else {
+                                    echo "Errore nell'aggiunta del metodo di pagamento";
+                                    echo $db->error;
                                 }
                                 if ($ok) {
                                     session_unset();

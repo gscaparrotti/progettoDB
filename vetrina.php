@@ -1,7 +1,8 @@
 <section id="a2" class="articolo">
   <header>
-    <h2>Ultimo Prodotto</h2>
+    <h2>Ultimo Prodotto Inserito</h2>
   </header>
+  <p>Questo è l'ultimo prodotto inserito nel nostro catalogo:<br></p>
   <section class="vetrina">
     <?php
       $db = mysqli_connect("localhost", "reader", "", "progetto");
@@ -68,7 +69,8 @@
                                     HAVING Disp > 0
                                     ORDER BY Vendite DESC
                                     LIMIT 3)ProdottiPiuVenduti
-                                    INNER JOIN Prodotto on ProdottiPiuVenduti.Prodotto = Prodotto.Codice");
+                                    INNER JOIN Prodotto on ProdottiPiuVenduti.Prodotto = Prodotto.Codice
+                                    ORDER BY Vendite DESC");
         if ($result) {
           if ($result->num_rows > 0) {
             while($row = $result->fetch_assoc()) { ?>

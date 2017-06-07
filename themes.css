@@ -243,6 +243,10 @@ input, textarea {
     display: none !important;
 }
 
+#a2 {
+    border-bottom: 0;
+}
+
 #delete_fieldset > label {
     margin: auto;
     margin-bottom: 2vh;

@@ -134,7 +134,7 @@ include("header_full.html");
                                 <?php break;
                             case ("Mostra Clienti e Metodi di Pagamento"): ?>
                                 <table class="secret_element" id="tabella_clenti" style="">
-                                    <?php $result = $db->query("SELECT `E-Mail`, Nome, Cognome, CAP, Citta, Via, Civico, Tipo as 'Metodo Pagamento', ID, Codice, Scadenza, CodSicurezza From Cliente INNER JOIN MetodoPagamento");
+                                    <?php $result = $db->query("SELECT `E-Mail`, Nome, Cognome, CAP, Citta, Via, Civico, Tipo as 'Metodo Pagamento', ID, Codice, Scadenza, CodSicurezza From Cliente INNER JOIN MetodoPagamento ON Cliente.`E-Mail` = MetodoPagamento.Cliente");
                                     if ($result) {
                                         $fields = $result->fetch_fields();
                                     }
