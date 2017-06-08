@@ -247,6 +247,14 @@ input, textarea {
     border-bottom: 0;
 }
 
+#tabella_miei_ordini {
+    margin-top: 3vh;
+}
+
+#miei_ordini_form {
+    margin-bottom: 3vh;
+}
+
 #delete_fieldset > label {
     margin: auto;
     margin-bottom: 2vh;
