@@ -11,7 +11,7 @@
         } else {
             $ids = $_POST['id'];
             $result = $db->query("SELECT *
-                                    FROM (SELECT *, Count(NULLIF(1, ProdottoInNegozio.Venduto)) as Disp FROM ProdottoInNegozio 
+                                    FROM (SELECT Prodotto, Condizione, Sconto, Count(NULLIF(1, ProdottoInNegozio.Venduto)) as Disp FROM ProdottoInNegozio 
                                     GROUP BY ProdottoInNegozio.Prodotto, ProdottoInNegozio.Condizione, ProdottoInNegozio.Sconto)ProdottiInNegozio
                                     INNER JOIN Prodotto on ProdottiInNegozio.Prodotto = Prodotto.Codice
                                     WHERE Codice=$ids");

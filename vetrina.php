@@ -10,8 +10,8 @@
       if(!$db) {
         echo "connection failed: ".mysqli_connect_error();
       } else {
-        $result = $db->query("SELECT ID, Produttore, Nome, img, Costo, Sconto, Disp, Descrizione
-                                    FROM (SELECT ProdottoInNegozio.Prodotto as ID, ProdottoInNegozio.Sconto as Sconto, Count(*) as Disp FROM ProdottoInNegozio 
+        $result = $db->query("SELECT ID, Produttore, Nome, img, Costo, Disp, Descrizione
+                                    FROM (SELECT ProdottoInNegozio.Prodotto as ID, Count(*) as Disp FROM ProdottoInNegozio 
                                     WHERE Venduto = 0
                                     GROUP BY ProdottoInNegozio.Prodotto
                                     ORDER BY DataFornitura DESC
@@ -26,7 +26,7 @@
               <?php } ?>
               <div class="dettagli_last">
                 <p class="descrizione"><?php echo $row["Descrizione"]; ?></p>
-                <p><?php echo $row["Costo"]. " €"; ?></p>
+                <p><?php echo "Prezzo di Listino: ".$row["Costo"]. " €"; ?></p>
                 <div class="disp_inner">
                   <p id="pezzi_disponibili"><?php echo $row["Disp"]; ?></p>
                   <p><?php
@@ -63,8 +63,8 @@
         echo "connection failed: ".mysqli_connect_error();
       } else {
         mysqli_set_charset($db, "utf8");
-        $result = $db->query("SELECT Prodotto, Produttore, Nome, img, Costo, Sconto, Vendite, Descrizione, Disp
-                                    FROM (SELECT Prodotto, Sconto, Count(NULLIF(0, ProdottoInNegozio.Venduto)) as Vendite, Count(NULLIF(1, ProdottoInNegozio.Venduto)) as Disp FROM ProdottoInNegozio 
+        $result = $db->query("SELECT Prodotto, Produttore, Nome, img, Costo, Vendite, Descrizione, Disp
+                                    FROM (SELECT Prodotto, Count(NULLIF(0, ProdottoInNegozio.Venduto)) as Vendite, Count(NULLIF(1, ProdottoInNegozio.Venduto)) as Disp FROM ProdottoInNegozio 
                                     GROUP BY ProdottoInNegozio.Prodotto
                                     HAVING Disp > 0
                                     ORDER BY Vendite DESC
@@ -79,7 +79,7 @@
                   <tr><td class="prdt_img_row"><img class="prdt_img" alt="immagine del prodotto" src="<?php echo $row["img"]; ?>"></td></tr>
                 <?php } ?>
                 <tr><td><?php echo $row["Produttore"]." ".$row["Nome"]; ?></td></tr>
-                <tr><td><?php echo $row["Costo"]. " €"; ?></td></tr>
+                <tr><td><?php echo "Prezzo di Listino: ".$row["Costo"]. " €"; ?></td></tr>
                 <tr><td><?php echo $row["Disp"];
                           if ($row["Disp"] == 1) {
                             echo " pezzo disponibile";

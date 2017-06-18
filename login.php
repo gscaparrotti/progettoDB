@@ -50,8 +50,6 @@ include("header_full.html");
                             <option value="Rimuovi Prodotto">Rimuovi Prodotto</option>
                             <option value="Aggiungi Ordinazione Prodotto">Aggiungi Ordinazione Prodotto</option>
                             <option value="Mostra/Modifica Ordinazioni Prodotto">Mostra/Modifica Ordinazioni Prodotto</option>
-                            <option value="Aggiungi Prodotto in Negozio">Aggiungi Prodotto in Negozio</option>
-                            <option value="Rimuovi Prodotto in Negozio">Rimuovi Prodotto in Negozio</option>
                             <option value="Aggiungi Fornitura">Aggiungi Fornitura</option>
                             <option value="Aggiungi Fornitore">Aggiungi Fornitore</option>
                             <option value="Rimuovi Fornitore">Rimuovi Fornitore</option>
