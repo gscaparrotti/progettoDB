@@ -74,7 +74,7 @@
         if ($result) {
           if ($result->num_rows > 0) {
             while($row = $result->fetch_assoc()) { ?>
-              <table id="<?php echo $row["id_prodotto"]?>" class="tabella_prodotti">
+              <table id="<?php echo $row["Prodotto"]?>" class="tabella_prodotti">
                 <?php if($row["img"] != null) { ?>
                   <tr><td class="prdt_img_row"><img class="prdt_img" alt="immagine del prodotto" src="<?php echo $row["img"]; ?>"></td></tr>
                 <?php } ?>
