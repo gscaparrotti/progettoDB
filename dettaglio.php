@@ -66,8 +66,7 @@
                         </table>
                         <?php
                         $result->data_seek(0);
-                        while ($row = $result->fetch_assoc()) {
-                            if ($row['Disp'] > 0) { ?>
+                        while ($row = $result->fetch_assoc()) { ?>
                         <div class="dettagli_bottom">
                             <p><?php echo "Condizione: ".$row['Condizione'] ?></p>
                             <p><?php echo "Prezzo:  ".($row["Costo"] - ($row["Costo"] * ($row['Sconto'] / 100))). " €"; ?></p>
@@ -80,11 +79,13 @@
                                         echo " pezzi disponibili";
                                     }?></p>
                             </div>
-                            <button type="button" onclick="addToCart(<?php echo $row['Codice'] ?>,'<?php echo $row["Produttore"]." ".$row['Nome'] ?>','<?php echo $row['Sconto'] ?>','<?php echo $row['Condizione'] ?>')">Acquista</button>
+                            <?php if ($row['Disp'] > 0) { ?>
+                                <button type="button" onclick="addToCart(<?php echo $row['Codice'] ?>,'<?php echo $row["Produttore"]." ".$row['Nome'] ?>','<?php echo $row['Sconto'] ?>','<?php echo $row['Condizione'] ?>')">Acquista</button>
+                            <? } else { ?>
+                                <button type="button" disabled>Esaurito</button>
+                            <? } ?>
                         </div>
-                        <?php } else {
-                                echo "<h4>Prodotto Esaurito</h4>";
-                            }
+                        <?php
                             } ?>
                     </div>
                     <?php
